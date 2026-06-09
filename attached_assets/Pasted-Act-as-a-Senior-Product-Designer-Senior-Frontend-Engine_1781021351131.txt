@@ -1,0 +1,633 @@
+Act as a Senior Product Designer, Senior Frontend Engineer, and SaaS Dashboard Architect.
+
+Build a complete modern enterprise-grade frontend application for a company called Oxygen Sports.
+
+PROJECT NAME:
+Academy Annual Contract Renewal Tracker
+
+BUSINESS CONTEXT:
+
+Oxygen Sports is a sports equipment supplier that provides cricket equipment, football gear, badminton equipment, sports apparel, training accessories and athletic products to sports academies, schools and clubs.
+
+The company manages annual supply contracts with these academies.
+
+Currently contracts are tracked manually using spreadsheets, WhatsApp messages and phone calls.
+
+This creates problems:
+
+• Missed renewal deadlines
+• Lost contracts to competitors
+• Poor visibility of upcoming expiries
+• No centralized data management
+• Difficult reporting and analytics
+• No automated tracking system
+
+The goal of this application is to help Oxygen Sports monitor academy contracts, track expiry dates, manage relationship managers, monitor price revisions and generate business reports.
+
+=====================================================
+
+TECH STACK
+
+Use:
+
+React
+Tailwind CSS
+React Router
+Lucide React Icons
+Recharts
+
+Build as a modern SaaS product.
+
+=====================================================
+
+DESIGN REQUIREMENTS
+
+Design Style:
+
+• Premium SaaS Dashboard
+• Similar to Salesforce
+• Similar to HubSpot
+• Similar to Zoho CRM
+• Similar to Monday.com
+
+Theme:
+
+Primary Color:
+#2563EB
+
+Accent Color:
+#F97316
+
+Background:
+Clean White
+
+Cards:
+Soft shadows
+Rounded corners
+
+Typography:
+Modern and professional
+
+Spacing:
+Generous whitespace
+
+Responsive:
+Desktop
+Tablet
+Mobile
+
+Do not create a basic student project UI.
+
+Create a production-quality business application.
+
+=====================================================
+
+APPLICATION STRUCTURE
+
+Create the following layout:
+
+LEFT SIDEBAR
+
+Logo:
+Oxygen Sports
+
+Navigation Items:
+
+Dashboard
+Contracts
+Renewal Entry
+Contract Detail
+Analytics
+Reports
+Alerts Center
+Settings
+
+Icons for every menu item.
+
+Sidebar should collapse on mobile.
+
+=====================================================
+
+TOP NAVIGATION BAR
+
+Include:
+
+Global Search
+Notification Bell
+Current Date
+User Profile Avatar
+User Name
+Role Badge
+
+=====================================================
+
+PAGE 1
+
+DASHBOARD HOME
+
+Purpose:
+Executive summary of the entire system.
+
+Create KPI Cards:
+
+Total Contracts
+Active Contracts
+Expiring Soon
+Renewed Contracts
+Archived Contracts
+Revenue Retained
+
+Each card must include:
+
+Icon
+Large Value
+Growth Percentage
+Mini Trend Indicator
+
+=====================================================
+
+Create Dashboard Widgets
+
+1. Upcoming Renewals
+
+Columns:
+
+Academy
+Renewal Date
+Days Remaining
+Status
+
+2. Contract Status Summary
+
+Statuses:
+
+Active
+Expiring Soon
+Renewed
+Archived
+
+3. Recent Activity Feed
+
+Examples:
+
+Contract Created
+Contract Updated
+Renewal Reminder Generated
+Price Revision Updated
+Status Changed
+
+=====================================================
+
+Quick Action Section
+
+Buttons:
+
+Add New Contract
+Generate Report
+Export Data
+View Alerts
+
+=====================================================
+
+PAGE 2
+
+CONTRACT ENTRY FORM
+
+Purpose:
+
+Staff members use this screen to create academy contracts.
+
+Create a multi-section professional form.
+
+=====================================================
+
+SECTION A
+
+ACADEMY INFORMATION
+
+Fields:
+
+Academy Name
+Academy Type
+Contact Person
+Phone Number
+Email Address
+Address
+City
+State
+
+Academy Type Options:
+
+Cricket Academy
+Football Academy
+Badminton Academy
+Basketball Academy
+Multi Sports Academy
+
+=====================================================
+
+SECTION B
+
+CONTRACT INFORMATION
+
+Fields:
+
+Contract ID
+Contract Start Date
+Contract Expiry Date
+Contract Duration
+
+Status:
+
+Active
+Renewed
+Expiring Soon
+Archived
+
+=====================================================
+
+SECTION C
+
+EQUIPMENT SUPPLY DETAILS
+
+Multi Select:
+
+Cricket Equipment
+Football Equipment
+Badminton Equipment
+Sports Apparel
+Training Accessories
+Fitness Equipment
+
+Fields:
+
+Quantity
+Supply Frequency
+
+=====================================================
+
+SECTION D
+
+PRICE REVISION
+
+Fields:
+
+Previous Contract Value
+Current Contract Value
+
+Automatically calculate:
+
+Price Revision Percentage
+
+Show visual indicator:
+
+Increase
+Decrease
+
+=====================================================
+
+SECTION E
+
+RELATIONSHIP MANAGEMENT
+
+Fields:
+
+Relationship Manager
+Department
+Notes
+
+=====================================================
+
+Validation Requirements
+
+Required Field Validation
+
+Email Validation
+
+Phone Validation
+
+Date Validation
+
+Success Toast
+
+Error Toast
+
+Loading State
+
+Save Contract Button
+
+Reset Button
+
+Save Draft Button
+
+=====================================================
+
+PAGE 3
+
+CONTRACT MANAGEMENT DASHBOARD
+
+Purpose:
+
+Main operational screen used by employees.
+
+=====================================================
+
+Create Filter Bar
+
+Global Search
+
+Filters:
+
+Status
+Academy Type
+Relationship Manager
+Date Range
+
+Buttons:
+
+Add Contract
+Export CSV
+Generate Report
+
+=====================================================
+
+Main Data Table
+
+Columns:
+
+Contract ID
+Academy Name
+Academy Type
+Equipment Category
+Relationship Manager
+Contract Value
+Renewal Date
+Days Remaining
+Status
+Actions
+
+=====================================================
+
+Status Colors
+
+Active = Green
+
+Expiring Soon = Orange
+
+Renewed = Blue
+
+Archived = Gray
+
+=====================================================
+
+Actions
+
+View
+Edit
+Delete
+Print
+
+=====================================================
+
+Features
+
+Sorting
+
+Pagination
+
+Search
+
+Filters
+
+Sticky Header
+
+Hover Effects
+
+Loading Skeleton
+
+Confirmation Modal before Delete
+
+=====================================================
+
+Side Panel
+
+Contracts Requiring Attention
+
+Priority Levels:
+
+Critical
+High
+Medium
+Low
+
+=====================================================
+
+PAGE 4
+
+CONTRACT DETAIL PAGE
+
+Purpose:
+
+Complete contract overview.
+
+Display:
+
+Academy Information
+
+Contract Information
+
+Equipment Details
+
+Price History
+
+Relationship Manager Information
+
+=====================================================
+
+Activity Timeline
+
+Contract Created
+
+Price Updated
+
+Renewal Reminder Generated
+
+Status Changed
+
+Contract Renewed
+
+=====================================================
+
+Buttons
+
+Edit Contract
+
+Print Contract
+
+Export PDF
+
+=====================================================
+
+PAGE 5
+
+ANALYTICS DASHBOARD
+
+Purpose:
+
+Management reporting and decision making.
+
+=====================================================
+
+Create Summary Cards
+
+Total Contracts
+
+Pending Renewals
+
+Revenue Retained
+
+Renewed Contracts
+
+At Risk Contracts
+
+=====================================================
+
+Create Recharts Visualizations
+
+1. Contract Status Distribution
+
+Pie Chart
+
+2. Monthly Renewals Trend
+
+Line Chart
+
+3. Revenue Retention Analysis
+
+Bar Chart
+
+4. Equipment Category Distribution
+
+Horizontal Bar Chart
+
+5. Relationship Manager Performance
+
+Leaderboard Card
+
+=====================================================
+
+PAGE 6
+
+REPORTS MODULE
+
+Purpose:
+
+Generate business reports.
+
+=====================================================
+
+Filters
+
+Date Range
+
+Status
+
+Relationship Manager
+
+Academy Type
+
+=====================================================
+
+Report Types
+
+Contract Summary Report
+
+Renewal Report
+
+Revenue Impact Report
+
+Relationship Manager Report
+
+=====================================================
+
+Buttons
+
+Generate Report
+
+Export PDF
+
+Export Excel
+
+Print Report
+
+=====================================================
+
+PAGE 7
+
+ALERTS CENTER
+
+Purpose:
+
+Prevent missing contract renewals.
+
+=====================================================
+
+Create Alert Categories
+
+Expiring Within 90 Days
+
+Expiring Within 60 Days
+
+Expiring Within 30 Days
+
+Expiring Within 7 Days
+
+=====================================================
+
+Priority Colors
+
+Red
+
+Orange
+
+Yellow
+
+=====================================================
+
+Alert Card Information
+
+Academy Name
+
+Renewal Date
+
+Days Remaining
+
+Contract Value
+
+Relationship Manager
+
+Priority
+
+=====================================================
+
+ADDITIONAL REQUIREMENTS
+
+Use React Router for navigation.
+
+Create reusable components.
+
+Use realistic dummy business data.
+
+Create professional empty states.
+
+Create loading states.
+
+Create responsive layouts.
+
+Create modern tables.
+
+Create modern forms.
+
+Create professional enterprise dashboard styling.
+
+The final application should look like a real commercial CRM product used by a sports equipment company and should be presentation-ready for an internship review.
