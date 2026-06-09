@@ -1,0 +1,665 @@
+You are a Senior Product Designer, Senior Frontend Engineer, SaaS Product Architect, and Enterprise UX Specialist.
+
+I already have a React + Tailwind frontend for this project.
+
+DO NOT rebuild the application from scratch.
+
+Instead, transform the existing application into a realistic enterprise-grade B2B contract management platform used internally by Oxygen Sports employees.
+
+PROJECT NAME:
+Academy Annual Contract Renewal Tracker
+
+BUSINESS CONTEXT:
+
+Oxygen Sports supplies sports equipment to academies, schools, clubs, and training centers.
+
+The primary users of this software are Oxygen Sports Relationship Managers and Administrators.
+
+This is NOT a consumer-facing product.
+
+This is an internal business application whose purpose is:
+
+* Tracking academy contracts
+* Monitoring contract expiry dates
+* Managing renewal workflows
+* Tracking relationship managers
+* Recording price revisions
+* Preventing loss of contracts to competitors
+* Generating management reports
+* Triggering renewal alerts
+
+The current version feels like a demo application because it contains fake metrics, fake analytics, placeholder values, and unrealistic dashboard widgets.
+
+Transform it into a real business application.
+
+=====================================================
+
+REMOVE ALL DEMO DATA
+
+Remove:
+
+* Fake revenue values
+* Fake percentages
+* Fake growth indicators
+* Fake monthly trends
+* Random KPI values
+* Placeholder academy names
+* Random notifications
+* Dummy business metrics
+
+DO NOT hardcode business data.
+
+Instead show proper empty states such as:
+
+"No Contracts Found"
+
+"No Records Available"
+
+"Create Your First Contract"
+
+"Awaiting Data"
+
+"Connect Backend Data"
+
+All dashboards, charts and reports must be ready for API integration and database-driven content.
+
+=====================================================
+
+AUTHENTICATION SYSTEM
+
+Authentication is mandatory.
+
+Create a professional login experience.
+
+LOGIN PAGE
+
+Fields:
+
+Employee ID
+Password
+
+Features:
+
+Show Password Toggle
+
+Remember Me
+
+Forgot Password
+
+Login Button
+
+Loading State
+
+Validation
+
+=====================================================
+
+USER ROLES
+
+Role 1:
+Relationship Manager
+
+Permissions:
+
+* Create Contracts
+* Edit Contracts
+* View Contracts
+* View Alerts
+* Generate Reports
+
+Role 2:
+Admin
+
+Permissions:
+
+* Full Access
+* Manage Users
+* Manage Settings
+* View All Contracts
+* Configure System
+
+=====================================================
+
+PROTECTED ROUTES
+
+Unauthenticated users should never access:
+
+Dashboard
+Contracts
+Reports
+Analytics
+Alerts
+Settings
+
+Redirect unauthenticated users to Login Page.
+
+=====================================================
+
+APPLICATION LAYOUT
+
+Create a modern enterprise SaaS layout.
+
+Design inspiration:
+
+Salesforce
+HubSpot CRM
+Zoho CRM
+Monday.com
+Notion Enterprise
+
+Theme:
+
+Blue Primary
+Orange Accent
+
+Professional typography
+
+Soft shadows
+
+Rounded corners
+
+Generous spacing
+
+Premium business look
+
+=====================================================
+
+REDESIGN SIDEBAR
+
+Current sidebar should be simplified.
+
+Structure:
+
+Dashboard
+
+Contracts
+
+* All Contracts
+* Create Contract
+* Renewal Tracker
+
+Relationship Managers
+
+Reports
+
+Alerts Center
+
+Settings
+
+Add icons.
+
+Support collapse/expand behavior.
+
+Mobile responsive.
+
+=====================================================
+
+TOP NAVIGATION
+
+Add:
+
+Global Search
+
+Notification Center
+
+Current Date
+
+User Avatar
+
+User Role Badge
+
+Quick Add Contract Button
+
+=====================================================
+
+REDESIGN HOME DASHBOARD
+
+The dashboard should focus on actions and priorities rather than fake analytics.
+
+Create:
+
+TODAY'S PRIORITIES SECTION
+
+Cards:
+
+Contracts Expiring Within 7 Days
+
+Contracts Expiring Within 30 Days
+
+Pending Renewals
+
+Recently Updated Contracts
+
+Pending Follow-Ups
+
+=====================================================
+
+CONTRACT HEALTH SYSTEM
+
+Create visual health indicators.
+
+HEALTH LEVELS
+
+Healthy
+
+Green
+
+90+ days remaining
+
+Attention Required
+
+Yellow
+
+30–90 days remaining
+
+High Risk
+
+Orange
+
+7–30 days remaining
+
+Critical
+
+Red
+
+Less than 7 days remaining
+
+Display health badges throughout the system.
+
+=====================================================
+
+RENEWAL WORKFLOW TIMELINE
+
+Every contract should show progress through the renewal lifecycle.
+
+Visual Timeline:
+
+Contract Created
+
+↓
+
+Active
+
+↓
+
+Reminder Sent
+
+↓
+
+Negotiation
+
+↓
+
+Renewed
+
+Display this on:
+
+Contract Detail Page
+
+Renewal Tracker
+
+=====================================================
+
+CONTRACT ENTRY FORM
+
+Keep the current form but improve it.
+
+Required Fields:
+
+Academy Name
+
+Academy Type
+
+Contact Person
+
+Contact Number
+
+Email
+
+Location
+
+Contract Start Date
+
+Contract End Date
+
+Equipment Category
+
+Contract Value
+
+Price Revision
+
+Relationship Manager
+
+Status
+
+Notes
+
+=====================================================
+
+VALIDATION
+
+Add:
+
+Required Validation
+
+Email Validation
+
+Phone Validation
+
+Date Validation
+
+Error Messages
+
+Success Notifications
+
+Loading States
+
+Unsaved Changes Warning
+
+=====================================================
+
+CONTRACT DASHBOARD
+
+Improve table usability.
+
+Columns:
+
+Contract ID
+
+Academy Name
+
+Academy Type
+
+Relationship Manager
+
+Contract Value
+
+Expiry Date
+
+Days Remaining
+
+Health Status
+
+Renewal Status
+
+Actions
+
+=====================================================
+
+FILTERS
+
+Academy Type
+
+Relationship Manager
+
+Expiry Period
+
+Status
+
+Equipment Category
+
+Date Range
+
+=====================================================
+
+GLOBAL SEARCH
+
+Search by:
+
+Academy Name
+
+Contract ID
+
+Relationship Manager
+
+Equipment Category
+
+=====================================================
+
+CONTRACT DETAIL PAGE
+
+Create an executive-quality detail page.
+
+Sections:
+
+Academy Information
+
+Contract Information
+
+Equipment Information
+
+Price Revision History
+
+Relationship Manager Details
+
+Renewal Timeline
+
+Activity History
+
+=====================================================
+
+ACTION HISTORY
+
+Show:
+
+Contract Created
+
+Contract Updated
+
+Reminder Sent
+
+Price Updated
+
+Renewal Completed
+
+Status Changed
+
+=====================================================
+
+BUTTONS
+
+Edit Contract
+
+Print Contract
+
+Export PDF
+
+Archive Contract
+
+=====================================================
+
+ALERTS CENTER
+
+Build a dedicated alerts module.
+
+Categories:
+
+Expiring in 90 Days
+
+Expiring in 60 Days
+
+Expiring in 30 Days
+
+Expiring in 7 Days
+
+=====================================================
+
+ALERT CARD
+
+Academy Name
+
+Expiry Date
+
+Days Remaining
+
+Contract Value
+
+Relationship Manager
+
+Priority
+
+=====================================================
+
+PRIORITY LEVELS
+
+Critical
+
+High
+
+Medium
+
+Low
+
+Use color coding.
+
+=====================================================
+
+NOTIFICATION CENTER
+
+Create realistic notifications.
+
+Examples:
+
+Contract expires in 5 days
+
+Reminder sent successfully
+
+Contract renewed
+
+Contract edited
+
+Price revision updated
+
+Notifications should come from backend data later.
+
+=====================================================
+
+REPORTS MODULE
+
+Make reports business-focused.
+
+Reports:
+
+Contract Summary
+
+Renewal Performance
+
+Relationship Manager Performance
+
+Expiring Contracts
+
+Equipment Category Analysis
+
+=====================================================
+
+EXPORT OPTIONS
+
+PDF
+
+Excel
+
+CSV
+
+Print
+
+=====================================================
+
+ANALYTICS
+
+Do NOT display fake charts.
+
+Charts must support real backend data later.
+
+When no data exists:
+
+Show professional empty-state components.
+
+=====================================================
+
+EMPTY STATES
+
+Create premium empty states throughout the application.
+
+Examples:
+
+No Contracts Available
+
+No Alerts Available
+
+No Reports Generated
+
+No Search Results Found
+
+Provide helpful call-to-action buttons.
+
+=====================================================
+
+ANIMATIONS
+
+Install Framer Motion.
+
+Use only professional enterprise animations.
+
+Allowed:
+
+Page transitions
+
+Modal animations
+
+Sidebar transitions
+
+Toast notifications
+
+Table hover effects
+
+Card hover effects
+
+Loading skeletons
+
+Do NOT use flashy consumer-style animations.
+
+=====================================================
+
+RESPONSIVENESS
+
+Fully responsive.
+
+Desktop
+
+Tablet
+
+Mobile
+
+=====================================================
+
+CODE QUALITY
+
+Refactor into reusable components.
+
+Create:
+
+Layout Components
+
+Table Components
+
+Form Components
+
+Badge Components
+
+Timeline Components
+
+Notification Components
+
+Modal Components
+
+Empty State Components
+
+=====================================================
+
+FINAL GOAL
+
+The application should no longer look like an internship demo.
+
+It should look like a real enterprise contract management CRM that Oxygen Sports relationship managers would use daily to manage academy contracts and renewal workflows.
+
+Focus on realism, usability, business workflows, scalability, professional UX, clean architecture, and future backend integration.
