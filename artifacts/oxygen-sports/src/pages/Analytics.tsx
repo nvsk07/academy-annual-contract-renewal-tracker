@@ -3,13 +3,16 @@ import {
   PieChart, Pie, Cell, Legend
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockContracts } from "@/data/contracts";
+import { getAllContracts } from "@/services/contractService";
+import { getRMPerformance, getEquipmentCategoryBreakdown, getContractSummaryStats } from "@/services/reportService";
 import { Target, TrendingUp, Activity, Users, Database } from "lucide-react";
-import { Button } from "react-day-picker";
+import { Button } from "@/components/ui/button";
 
 export default function Analytics() {
+  const contracts = getAllContracts();
+  
   // Compute Status Distribution
-  const statusCounts = mockContracts.reduce((acc, curr) => {
+  const statusCounts = contracts.reduce((acc, curr) => {
     acc[curr.status] = (acc[curr.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -22,34 +25,27 @@ export default function Analytics() {
   ].filter(d => d.value > 0);
 
   // Compute Equipment Categories Frequency
-  const catFreq: Record<string, number> = {};
-  mockContracts.forEach(c => {
-    c.equipmentCategories.forEach(cat => {
-      catFreq[cat] = (catFreq[cat] || 0) + 1;
-    });
-  });
-  const equipmentData = Object.entries(catFreq)
+  const breakdown = getEquipmentCategoryBreakdown(contracts);
+  const equipmentData = Object.entries(breakdown)
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count);
 
   // Compute RM Performance Leaderboard
-  const rmMap: Record<string, { contracts: number, value: number }> = {};
-  mockContracts.forEach(c => {
-    if (!rmMap[c.relationshipManager]) {
-      rmMap[c.relationshipManager] = { contracts: 0, value: 0 };
-    }
-    rmMap[c.relationshipManager].contracts += 1;
-    rmMap[c.relationshipManager].value += c.currentContractValue;
-  });
-  
-  const rmPerformance = Object.entries(rmMap)
-    .map(([name, data]) => ({
-      name,
-      contracts: data.contracts,
-      valueFormatted: `₹${(data.value / 100000).toFixed(1)}L`,
-      progress: Math.min(100, Math.round((data.value / 2000000) * 100)) // Fake target
-    }))
+  const rmStats = getRMPerformance(contracts);
+  const rmPerformance = rmStats
+    .map((rm) => {
+      const rmContracts = contracts.filter(c => c.relationshipManager === rm.name);
+      const totalValue = rmContracts.reduce((acc, c) => acc + c.currentContractValue, 0);
+      return {
+        name: rm.name,
+        contracts: rm.total,
+        valueFormatted: `₹${(totalValue / 100000).toFixed(1)}L`,
+        progress: Math.min(100, Math.round((totalValue / 2000000) * 100)) // Fake target
+      };
+    })
     .sort((a, b) => b.contracts - a.contracts);
+
+  const { totalValue } = getContractSummaryStats(contracts);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
@@ -66,7 +62,7 @@ export default function Analytics() {
             </div>
             <div>
               <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Value</p>
-              <h3 className="text-2xl font-black">₹{(mockContracts.reduce((a,c)=>a+c.currentContractValue,0)/100000).toFixed(1)}L</h3>
+              <h3 className="text-2xl font-black">₹{(totalValue / 100000).toFixed(1)}L</h3>
             </div>
           </CardContent>
         </Card>
@@ -77,7 +73,7 @@ export default function Analytics() {
             </div>
             <div>
               <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Avg Contract</p>
-              <h3 className="text-2xl font-black">₹{((mockContracts.reduce((a,c)=>a+c.currentContractValue,0)/mockContracts.length)/100000).toFixed(1)}L</h3>
+              <h3 className="text-2xl font-black">₹{((totalValue / (contracts.length || 1)) / 100000).toFixed(1)}L</h3>
             </div>
           </CardContent>
         </Card>
@@ -89,7 +85,7 @@ export default function Analytics() {
             <div>
               <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Renewal Rate</p>
               <h3 className="text-2xl font-black">
-                {Math.round((statusCounts['Renewed'] || 0) / mockContracts.length * 100)}%
+                {Math.round((statusCounts['Renewed'] || 0) / (contracts.length || 1) * 100)}%
               </h3>
             </div>
           </CardContent>
@@ -101,7 +97,7 @@ export default function Analytics() {
             </div>
             <div>
               <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Academies</p>
-              <h3 className="text-2xl font-black">{mockContracts.length}</h3>
+              <h3 className="text-2xl font-black">{contracts.length}</h3>
             </div>
           </CardContent>
         </Card>

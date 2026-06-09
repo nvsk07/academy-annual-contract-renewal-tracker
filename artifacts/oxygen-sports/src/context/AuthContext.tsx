@@ -1,16 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-export interface User {
-  id: string;
-  employeeId: string;
-  name: string;
-  role: "admin" | "relationship_manager";
-  department: string;
-  avatar: string;
-}
+import { validateCredentials, persistSession, loadSession, clearSession, AuthUser } from "@/services/authService";
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   login: (employeeId: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -19,17 +11,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("oxygen_auth_user");
+    const storedUser = loadSession();
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        localStorage.removeItem("oxygen_auth_user");
-      }
+      setUser(storedUser);
     }
     setIsLoading(false);
   }, []);
@@ -40,18 +28,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await new Promise(resolve => setTimeout(resolve, 800));
     
     try {
-      let loggedInUser: User | null = null;
-      if (employeeId === "OXY-001" && password === "admin123") {
-        loggedInUser = { id: "1", employeeId: "OXY-001", name: "Rajesh Kumar", role: "admin", department: "Sales", avatar: "RK" };
-      } else if (employeeId === "OXY-002" && password === "rm123") {
-        loggedInUser = { id: "2", employeeId: "OXY-002", name: "Priya Sharma", role: "relationship_manager", department: "Cricket Sales", avatar: "PS" };
-      } else if (employeeId === "OXY-003" && password === "rm123") {
-        loggedInUser = { id: "3", employeeId: "OXY-003", name: "Arjun Mehta", role: "relationship_manager", department: "Football Sales", avatar: "AM" };
-      }
+      const loggedInUser = validateCredentials(employeeId, password);
       
       if (loggedInUser) {
         setUser(loggedInUser);
-        localStorage.setItem("oxygen_auth_user", JSON.stringify(loggedInUser));
+        persistSession(loggedInUser);
       } else {
         throw new Error("Invalid credentials. Please try again.");
       }
@@ -62,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("oxygen_auth_user");
+    clearSession();
   };
 
   return (

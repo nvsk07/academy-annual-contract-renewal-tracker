@@ -1,34 +1,25 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { mockContracts, getDaysRemaining, getHealthStatus } from "@/data/contracts";
+import { getAllContracts } from "@/services/contractService";
+import { getRMPerformance } from "@/services/reportService";
 import HealthBadge from "@/components/HealthBadge";
 import { Link } from "wouter";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function RelationshipManagers() {
-  const rmNames = Array.from(new Set(mockContracts.map(c => c.relationshipManager)));
-
-  const rmStats = rmNames.map(name => {
-    const contracts = mockContracts.filter(c => c.relationshipManager === name);
-    const total = contracts.length;
-    const active = contracts.filter(c => c.status === "Active").length;
-    const expiringSoon = contracts.filter(c => c.status === "Expiring Soon").length;
-    const renewed = contracts.filter(c => c.status === "Renewed").length;
-    const critical = contracts.filter(c => getHealthStatus(getDaysRemaining(c.contractExpiryDate)) === "critical").length;
-    const department = contracts[0]?.department || "Sales";
-
-    const renewalRate = total > 0 ? Math.round((renewed / total) * 100) : 0;
+  const contracts = getAllContracts();
+  
+  const rmStats = getRMPerformance(contracts).map(rm => {
+    const rmContracts = contracts.filter(c => c.relationshipManager === rm.name);
+    const critical = rmContracts.filter(c => c.healthStatus === "critical").length;
+    const department = rmContracts[0]?.department || "Sales";
 
     return {
-      name,
+      ...rm,
       department,
-      initials: name.split(' ').map(n => n[0]).join(''),
-      total,
-      active,
-      expiringSoon,
-      renewed,
-      critical,
-      renewalRate
+      initials: rm.name.split(' ').map(n => n[0]).join(''),
+      critical
     };
   });
 
@@ -60,14 +51,14 @@ export default function RelationshipManagers() {
                 </div>
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
                   <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Expiring Soon</div>
-                  <div className="text-2xl font-black text-orange-600">{rm.expiringSoon}</div>
+                  <div className="text-2xl font-black text-orange-600">{rm.expiring}</div>
                 </div>
               </div>
 
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium text-slate-600">Renewal Rate</span>
-                  <span className="font-bold text-slate-900">{rm.renewalRate}%</span>
+                  <span className="font-bold text-slate-900">{rm.renewalRate.toFixed(0)}%</span>
                 </div>
                 <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div 
@@ -102,8 +93,7 @@ export default function RelationshipManagers() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {mockContracts.map(contract => {
-                const days = getDaysRemaining(contract.contractExpiryDate);
+              {contracts.map(contract => {
                 return (
                   <tr key={contract.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-4 py-3 font-semibold text-slate-900">{contract.relationshipManager}</td>
@@ -113,8 +103,8 @@ export default function RelationshipManagers() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 font-medium text-slate-700">₹{(contract.currentContractValue/100000).toFixed(1)}L</td>
-                    <td className="px-4 py-3 text-slate-600">{new Date(contract.contractExpiryDate).toLocaleDateString('en-IN')}</td>
-                    <td className="px-4 py-3"><HealthBadge daysRemaining={days} /></td>
+                    <td className="px-4 py-3 text-slate-600">{formatDate(contract.contractExpiryDate)}</td>
+                    <td className="px-4 py-3"><HealthBadge daysRemaining={contract.daysRemaining} /></td>
                     <td className="px-4 py-3 text-slate-600 font-medium">{contract.status}</td>
                   </tr>
                 );

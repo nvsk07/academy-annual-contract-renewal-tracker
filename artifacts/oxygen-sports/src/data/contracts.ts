@@ -476,34 +476,3 @@ export const mockContracts: Contract[] = [
     updatedAt: "2023-11-01T11:00:00Z"
   }
 ];
-
-export function getDaysRemaining(expiryDate: string): number {
-  return Math.ceil((new Date(expiryDate).getTime() - new Date("2026-06-09").getTime()) / (1000 * 60 * 60 * 24));
-}
-
-export function getHealthStatus(daysRemaining: number): "healthy" | "attention" | "high-risk" | "critical" {
-  if (daysRemaining < 7) return "critical";
-  if (daysRemaining < 30) return "high-risk";
-  if (daysRemaining < 90) return "attention";
-  return "healthy";
-}
-
-export function getHealthLabel(health: string): string {
-  switch (health) {
-    case "critical": return "Critical";
-    case "high-risk": return "High Risk";
-    case "attention": return "Attention Required";
-    case "healthy": return "Healthy";
-    default: return "Unknown";
-  }
-}
-
-export function getHealthColor(health: string): string {
-  switch (health) {
-    case "critical": return "bg-red-100 text-red-800";
-    case "high-risk": return "bg-orange-100 text-orange-800";
-    case "attention": return "bg-yellow-100 text-yellow-800";
-    case "healthy": return "bg-green-100 text-green-800";
-    default: return "bg-slate-100 text-slate-800";
-  }
-}

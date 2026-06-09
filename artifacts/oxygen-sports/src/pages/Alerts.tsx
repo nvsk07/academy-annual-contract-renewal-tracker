@@ -5,38 +5,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { mockContracts, getDaysRemaining, getHealthStatus } from "@/data/contracts";
-import { Clock, Calendar, Mail, CheckCircle2 } from "lucide-react";
+import { getContractsSortedByUrgency, ContractWithHealth } from "@/services/contractService";
+import { Clock, Calendar, Mail } from "lucide-react";
 import HealthBadge from "@/components/HealthBadge";
+import { getPriorityLabel, getHealthBorderClass } from "@/utils/contractUtils";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function Alerts() {
   const [acknowledged, setAcknowledged] = useState<Record<string, boolean>>({});
 
-  const alertsData = mockContracts.map(c => {
-    const days = getDaysRemaining(c.contractExpiryDate);
-    return {
+  const alertsData = getContractsSortedByUrgency()
+    .filter(c => c.daysRemaining < 90)
+    .map(c => ({
       ...c,
-      daysRemaining: days,
-      priority: days < 7 ? "Critical" : days < 30 ? "High" : days < 60 ? "Medium" : "Low",
-      health: getHealthStatus(days)
-    };
-  }).filter(c => c.daysRemaining < 90).sort((a, b) => a.daysRemaining - b.daysRemaining);
+      priorityLabel: getPriorityLabel(c.daysRemaining)
+    }));
 
-  const criticalCount = alertsData.filter(a => a.priority === "Critical").length;
-  const highCount = alertsData.filter(a => a.priority === "High").length;
-  const mediumCount = alertsData.filter(a => a.priority === "Medium").length;
-  const lowCount = alertsData.filter(a => a.priority === "Low").length;
+  const criticalCount = alertsData.filter(a => a.priorityLabel === "Critical").length;
+  const highCount = alertsData.filter(a => a.priorityLabel === "High").length;
+  const mediumCount = alertsData.filter(a => a.priorityLabel === "Medium").length;
+  const lowCount = alertsData.filter(a => a.priorityLabel === "Low").length;
 
   const toggleAcknowledge = (id: string) => {
     setAcknowledged(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const renderAlertCard = (alert: any) => {
+  const renderAlertCard = (alert: ContractWithHealth & { priorityLabel: string }) => {
     const isAck = acknowledged[alert.id];
-    const borderColor = 
-      alert.priority === "Critical" ? "border-red-500" :
-      alert.priority === "High" ? "border-orange-500" :
-      alert.priority === "Medium" ? "border-amber-500" : "border-green-500";
+    const borderColor = getHealthBorderClass(alert.healthStatus);
 
     return (
       <Card key={alert.id} className={`overflow-hidden border-l-4 ${borderColor} ${isAck ? 'opacity-60 grayscale-[0.5]' : ''} shadow-sm transition-all`}>
@@ -56,7 +52,7 @@ export default function Alerts() {
           <div className="grid grid-cols-2 gap-4 mt-6 mb-6">
             <div>
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Days Remaining</div>
-              <div className={`text-3xl font-black ${alert.priority === 'Critical' ? 'text-red-600' : 'text-slate-900'}`}>
+              <div className={`text-3xl font-black ${alert.priorityLabel === 'Critical' ? 'text-red-600' : 'text-slate-900'}`}>
                 {alert.daysRemaining}
               </div>
             </div>
@@ -64,7 +60,7 @@ export default function Alerts() {
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Renewal Date</div>
               <div className="font-bold text-slate-700 flex items-center justify-end">
                 <Calendar className="h-3.5 w-3.5 mr-1" />
-                {new Date(alert.contractExpiryDate).toLocaleDateString('en-IN')}
+                {formatDate(alert.contractExpiryDate)}
               </div>
             </div>
           </div>
@@ -131,17 +127,17 @@ export default function Alerts() {
         </TabsContent>
         <TabsContent value="critical" className="m-0 border-none p-0 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {alertsData.filter(a => a.priority === "Critical").map(renderAlertCard)}
+            {alertsData.filter(a => a.priorityLabel === "Critical").map(renderAlertCard)}
           </div>
         </TabsContent>
         <TabsContent value="high" className="m-0 border-none p-0 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {alertsData.filter(a => a.priority === "High").map(renderAlertCard)}
+            {alertsData.filter(a => a.priorityLabel === "High").map(renderAlertCard)}
           </div>
         </TabsContent>
         <TabsContent value="medium" className="m-0 border-none p-0 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {alertsData.filter(a => a.priority === "Medium").map(renderAlertCard)}
+            {alertsData.filter(a => a.priorityLabel === "Medium").map(renderAlertCard)}
           </div>
         </TabsContent>
       </Tabs>

@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
-import { mockContracts, getDaysRemaining } from "@/data/contracts";
+import { useAuth } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useNotifications";
+import { getContractsExpiringWithin } from "@/services/contractService";
+import { TODAY_DATE } from "@/constants/appConstants";
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { notifications, unreadCount } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -18,12 +21,10 @@ export default function Header() {
     day: 'numeric', 
     month: 'long', 
     year: 'numeric' 
-  }).format(new Date("2026-06-09"));
+  }).format(new Date(TODAY_DATE));
 
-  const recentAlerts = mockContracts
-    .map(c => ({ ...c, days: getDaysRemaining(c.contractExpiryDate) }))
-    .filter(c => c.days < 30)
-    .sort((a, b) => a.days - b.days)
+  const recentAlerts = getContractsExpiringWithin(30)
+    .sort((a, b) => a.daysRemaining - b.daysRemaining)
     .slice(0, 3);
 
   return (
@@ -58,7 +59,7 @@ export default function Header() {
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell className="h-5 w-5" />
-            {recentAlerts.length > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border-2 border-white"></span>
             )}
           </Button>
@@ -86,7 +87,7 @@ export default function Header() {
                         <Link key={alert.id} href={`/contracts/${alert.id}`} onClick={() => setShowNotifications(false)}>
                           <div className="p-3 hover:bg-slate-50 transition-colors cursor-pointer block">
                             <div className="text-sm font-medium text-slate-900 line-clamp-1">{alert.academyName}</div>
-                            <div className="text-xs text-slate-500 mt-0.5">Expires in {alert.days} days</div>
+                            <div className="text-xs text-slate-500 mt-0.5">Expires in {alert.daysRemaining} days</div>
                           </div>
                         </Link>
                       ))

@@ -1,62 +1,39 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockContracts, getDaysRemaining, getHealthStatus } from "@/data/contracts";
+import { getContractsSortedByUrgency, getHealthSummary, getContractsExpiringWithin, getAllContracts } from "@/services/contractService";
 import { mockActivity } from "@/data/activity";
 import HealthBadge from "@/components/HealthBadge";
 import { 
-  AlertCircle, Activity, Plus, TrendingUp, CheckCircle, Clock, 
-  ArrowRight, Users, Bell, FileText,
-  RefreshCw
+  AlertCircle, Activity as ActivityIcon, Plus, TrendingUp, CheckCircle, Clock, 
+  ArrowRight, Bell, RefreshCw
 } from "lucide-react";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function Dashboard() {
-  const [contracts] = useState(mockContracts);
+  const allContracts = getAllContracts();
   
-  const contractsWithHealth = contracts.map(c => ({
-    ...c,
-    daysRemaining: getDaysRemaining(c.contractExpiryDate),
-    health: getHealthStatus(getDaysRemaining(c.contractExpiryDate))
-  }));
-
-  const expiringWithin7 = contractsWithHealth.filter(c => c.daysRemaining > 0 && c.daysRemaining <= 7).length;
-  const expiringWithin30 = contractsWithHealth.filter(c => c.daysRemaining > 0 && c.daysRemaining <= 30).length;
-  const pendingRenewals = contractsWithHealth.filter(c => c.status === "Expiring Soon").length;
+  const expiringWithin7 = getContractsExpiringWithin(7).length;
+  const expiringWithin30 = getContractsExpiringWithin(30).length;
+  const pendingRenewals = allContracts.filter(c => c.status === "Expiring Soon").length;
   
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const recentlyUpdated = contractsWithHealth.filter(c => new Date(c.updatedAt) >= sevenDaysAgo).length;
+  const recentlyUpdated = allContracts.filter(c => new Date(c.updatedAt) >= sevenDaysAgo).length;
 
-  const healthCounts = {
-    critical: contractsWithHealth.filter(c => c.health === "critical").length,
-    highRisk: contractsWithHealth.filter(c => c.health === "high-risk").length,
-    attention: contractsWithHealth.filter(c => c.health === "attention").length,
-    healthy: contractsWithHealth.filter(c => c.health === "healthy").length,
-  };
+  const healthCounts = getHealthSummary();
 
-  const immediateAttention = [...contractsWithHealth]
-    .filter(c => c.health === "critical" || c.health === "high-risk")
-    .sort((a, b) => a.daysRemaining - b.daysRemaining)
+  const immediateAttention = getContractsSortedByUrgency()
+    .filter(c => c.healthStatus === "critical" || c.healthStatus === "high-risk")
     .slice(0, 5);
 
   const stageCounts = {
-    created: contractsWithHealth.filter(c => c.status === "Active" && c.daysRemaining > 90).length,
-    active: contractsWithHealth.filter(c => c.status === "Active" && c.daysRemaining <= 90 && c.daysRemaining > 30).length,
-    reminder: contractsWithHealth.filter(c => c.status === "Expiring Soon").length,
+    created: allContracts.filter(c => c.status === "Active" && c.daysRemaining > 90).length,
+    active: allContracts.filter(c => c.status === "Active" && c.daysRemaining <= 90 && c.daysRemaining > 30).length,
+    reminder: allContracts.filter(c => c.status === "Expiring Soon").length,
     negotiation: 0, // Placeholder
-    renewed: contractsWithHealth.filter(c => c.status === "Renewed").length,
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch(status) {
-      case "Active": return <Badge className="bg-green-100 text-green-800 border-none">Active</Badge>;
-      case "Expiring Soon": return <Badge className="bg-orange-100 text-orange-800 border-none">Expiring</Badge>;
-      case "Renewed": return <Badge className="bg-blue-100 text-blue-800 border-none">Renewed</Badge>;
-      case "Archived": return <Badge className="bg-slate-100 text-slate-800 border-none">Archived</Badge>;
-      default: return <Badge>{status}</Badge>;
-    }
+    renewed: allContracts.filter(c => c.status === "Renewed").length,
   };
 
   return (
@@ -117,7 +94,7 @@ export default function Dashboard() {
                 <h3 className="text-3xl font-bold mt-1 text-slate-900">{pendingRenewals}</h3>
               </div>
               <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
-                <Activity className="h-5 w-5" />
+                <ActivityIcon className="h-5 w-5" />
               </div>
             </div>
             <Link href="/contracts/renewal-tracker" className="mt-4 flex items-center text-xs text-blue-600 font-medium hover:text-blue-800 transition-colors">
@@ -148,7 +125,7 @@ export default function Dashboard() {
       <Card className="shadow-sm">
         <CardHeader className="pb-3 border-b border-slate-100">
           <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Activity className="h-4 w-4 text-blue-600" /> Contract Health Overview
+            <ActivityIcon className="h-4 w-4 text-blue-600" /> Contract Health Overview
           </CardTitle>
         </CardHeader>
         <CardContent className="p-5">
@@ -164,7 +141,7 @@ export default function Dashboard() {
               <div className="h-3 w-3 rounded-full bg-orange-500"></div>
               <div className="flex-1">
                 <div className="text-xs font-medium text-orange-800 uppercase">High Risk</div>
-                <div className="text-xl font-bold text-orange-900 leading-tight">{healthCounts.highRisk}</div>
+                <div className="text-xl font-bold text-orange-900 leading-tight">{healthCounts["high-risk"]}</div>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-100 px-4 py-2 rounded-lg flex-1 min-w-[150px]">
@@ -223,7 +200,7 @@ export default function Dashboard() {
                             <HealthBadge daysRemaining={c.daysRemaining} />
                           </td>
                           <td className="px-4 py-3 text-slate-600">
-                            {new Date(c.contractExpiryDate).toLocaleDateString('en-IN')}
+                            {formatDate(c.contractExpiryDate)}
                           </td>
                           <td className="px-4 py-3 font-bold text-slate-900">
                             {c.daysRemaining}
@@ -296,7 +273,7 @@ export default function Dashboard() {
                       {activity.type === 'contract_created' && <Plus className="h-4 w-4 text-blue-500" />}
                       {activity.type === 'contract_renewed' && <CheckCircle className="h-4 w-4 text-green-500" />}
                       {activity.type === 'price_updated' && <TrendingUp className="h-4 w-4 text-indigo-500" />}
-                      {activity.type === 'status_changed' && <Activity className="h-4 w-4 text-orange-500" />}
+                      {activity.type === 'status_changed' && <ActivityIcon className="h-4 w-4 text-orange-500" />}
                       {activity.type === 'reminder_generated' && <Bell className="h-4 w-4 text-slate-500" />}
                     </div>
                     <div className="pt-1">

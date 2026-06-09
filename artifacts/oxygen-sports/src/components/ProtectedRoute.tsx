@@ -1,11 +1,11 @@
 import { ReactNode, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
-  const [_, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (!isLoading && !user) {

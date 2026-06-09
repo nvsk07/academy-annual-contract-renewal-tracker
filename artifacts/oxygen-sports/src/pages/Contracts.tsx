@@ -1,4 +1,3 @@
-import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +7,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
 } from "@/components/ui/select";
 import { 
-  Search, Plus, Download, FileBarChart, Eye, Pencil, Trash2, Archive, X,
+  Search, Plus, Download, Eye, Pencil, Trash2, Archive, X,
   AlertCircle
 } from "lucide-react";
-import { mockContracts, getDaysRemaining, getHealthStatus, getHealthColor } from "@/data/contracts";
 import HealthBadge from "@/components/HealthBadge";
 import {
   AlertDialog,
@@ -25,65 +23,29 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useContracts } from "@/hooks/useContracts";
+import { getHealthBadgeClasses, getStatusBadgeClasses } from "@/utils/contractUtils";
+import { formatCurrency } from "@/utils/currencyUtils";
+import { formatDate } from "@/utils/dateUtils";
+import { CONTRACT_STATUSES, ACADEMY_TYPES } from "@/constants/contractConstants";
 
 export default function Contracts() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [healthFilter, setHealthFilter] = useState("All");
-  const [rmFilter, setRmFilter] = useState("All");
-  const [typeFilter, setTypeFilter] = useState("All");
   const { toast } = useToast();
-
-  const contractsWithComputed = useMemo(() => {
-    return mockContracts.map(c => {
-      const days = getDaysRemaining(c.contractExpiryDate);
-      return {
-        ...c,
-        daysRemaining: days,
-        health: getHealthStatus(days)
-      };
-    });
-  }, []);
-
-  const filteredContracts = contractsWithComputed.filter(c => {
-    const matchesSearch = c.academyName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          c.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          c.relationshipManager.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "All" || c.status === statusFilter;
-    const matchesHealth = healthFilter === "All" || c.health === healthFilter;
-    const matchesRM = rmFilter === "All" || c.relationshipManager === rmFilter;
-    const matchesType = typeFilter === "All" || c.academyType === typeFilter;
-    
-    return matchesSearch && matchesStatus && matchesHealth && matchesRM && matchesType;
-  });
+  const { contracts, allContracts, filters, setFilter, clearFilters } = useContracts();
 
   const activeFiltersCount = [
-    statusFilter !== "All", 
-    healthFilter !== "All", 
-    rmFilter !== "All", 
-    typeFilter !== "All"
+    filters.status !== "All", 
+    filters.healthStatus !== "All", 
+    filters.relationshipManager !== "All", 
+    filters.academyType !== "All"
   ].filter(Boolean).length;
 
-  const clearFilters = () => {
-    setStatusFilter("All");
-    setHealthFilter("All");
-    setRmFilter("All");
-    setTypeFilter("All");
-    setSearchTerm("");
-  };
-
-  const requiresAttention = [...contractsWithComputed]
-    .filter(c => c.health === "critical" || c.health === "high-risk")
+  const requiresAttention = [...allContracts]
+    .filter(c => c.healthStatus === "critical" || c.healthStatus === "high-risk")
     .sort((a, b) => a.daysRemaining - b.daysRemaining);
 
   const getStatusBadge = (status: string) => {
-    switch(status) {
-      case "Active": return <Badge className="bg-green-100 text-green-800 border-none shadow-none font-medium">Active</Badge>;
-      case "Expiring Soon": return <Badge className="bg-orange-100 text-orange-800 border-none shadow-none font-medium">Expiring Soon</Badge>;
-      case "Renewed": return <Badge className="bg-blue-100 text-blue-800 border-none shadow-none font-medium">Renewed</Badge>;
-      case "Archived": return <Badge className="bg-slate-100 text-slate-800 border-none shadow-none font-medium">Archived</Badge>;
-      default: return <Badge>{status}</Badge>;
-    }
+    return <Badge className={`${getStatusBadgeClasses(status)} border-none shadow-none font-medium`}>{status}</Badge>;
   };
 
   const handleExport = () => {
@@ -97,6 +59,8 @@ export default function Contracts() {
   const handleArchive = (id: string) => {
     toast({ title: "Archived", description: `Contract ${id} archived.` });
   };
+
+  const uniqueRMs = Array.from(new Set(allContracts.map(c => c.relationshipManager)));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -128,14 +92,14 @@ export default function Contracts() {
                   <Input 
                     placeholder="Search by Academy Name, Contract ID, or RM..." 
                     className="pl-9 bg-slate-50 border-slate-200"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={filters.search}
+                    onChange={(e) => setFilter("search", e.target.value)}
                   />
                 </div>
                 
                 {/* Filters Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  <Select value={healthFilter} onValueChange={setHealthFilter}>
+                  <Select value={filters.healthStatus} onValueChange={(v) => setFilter("healthStatus", v)}>
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Health Status" />
                     </SelectTrigger>
@@ -148,38 +112,37 @@ export default function Contracts() {
                     </SelectContent>
                   </Select>
 
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <Select value={filters.status} onValueChange={(v) => setFilter("status", v)}>
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Contract Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All">All Statuses</SelectItem>
-                      <SelectItem value="Active">Active</SelectItem>
-                      <SelectItem value="Expiring Soon">Expiring Soon</SelectItem>
-                      <SelectItem value="Renewed">Renewed</SelectItem>
-                      <SelectItem value="Archived">Archived</SelectItem>
+                      {CONTRACT_STATUSES.map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
 
-                  <Select value={rmFilter} onValueChange={setRmFilter}>
+                  <Select value={filters.relationshipManager} onValueChange={(v) => setFilter("relationshipManager", v)}>
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Relationship Manager" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All">All Managers</SelectItem>
-                      {Array.from(new Set(mockContracts.map(c => c.relationshipManager))).map(rm => (
+                      {uniqueRMs.map(rm => (
                         <SelectItem key={rm} value={rm}>{rm}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <Select value={filters.academyType} onValueChange={(v) => setFilter("academyType", v)}>
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Academy Type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All">All Types</SelectItem>
-                      {Array.from(new Set(mockContracts.map(c => c.academyType))).map(type => (
+                      {ACADEMY_TYPES.map(type => (
                         <SelectItem key={type} value={type}>{type}</SelectItem>
                       ))}
                     </SelectContent>
@@ -190,24 +153,24 @@ export default function Contracts() {
                 {activeFiltersCount > 0 && (
                   <div className="flex items-center gap-2 pt-2 border-t border-slate-100 flex-wrap">
                     <span className="text-xs font-medium text-slate-500">Active Filters:</span>
-                    {healthFilter !== "All" && (
-                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setHealthFilter("All")}>
-                        Health: {healthFilter} <X className="ml-1 h-3 w-3" />
+                    {filters.healthStatus !== "All" && (
+                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setFilter("healthStatus", "All")}>
+                        Health: {filters.healthStatus} <X className="ml-1 h-3 w-3" />
                       </Badge>
                     )}
-                    {statusFilter !== "All" && (
-                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setStatusFilter("All")}>
-                        Status: {statusFilter} <X className="ml-1 h-3 w-3" />
+                    {filters.status !== "All" && (
+                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setFilter("status", "All")}>
+                        Status: {filters.status} <X className="ml-1 h-3 w-3" />
                       </Badge>
                     )}
-                    {rmFilter !== "All" && (
-                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setRmFilter("All")}>
-                        RM: {rmFilter} <X className="ml-1 h-3 w-3" />
+                    {filters.relationshipManager !== "All" && (
+                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setFilter("relationshipManager", "All")}>
+                        RM: {filters.relationshipManager} <X className="ml-1 h-3 w-3" />
                       </Badge>
                     )}
-                    {typeFilter !== "All" && (
-                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setTypeFilter("All")}>
-                        Type: {typeFilter} <X className="ml-1 h-3 w-3" />
+                    {filters.academyType !== "All" && (
+                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer" onClick={() => setFilter("academyType", "All")}>
+                        Type: {filters.academyType} <X className="ml-1 h-3 w-3" />
                       </Badge>
                     )}
                     <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-slate-500" onClick={clearFilters}>
@@ -236,7 +199,7 @@ export default function Contracts() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredContracts.map((contract) => (
+                  {contracts.map((contract) => (
                     <tr key={contract.id} className="hover:bg-slate-50/80 transition-colors group">
                       <td className="px-4 py-3 font-medium text-slate-900">
                         <Link href={`/contracts/${contract.id}`} className="hover:text-blue-600 transition-colors">
@@ -249,10 +212,10 @@ export default function Contracts() {
                       </td>
                       <td className="px-4 py-3 text-slate-600">{contract.relationshipManager}</td>
                       <td className="px-4 py-3 font-medium text-slate-900">₹{(contract.currentContractValue/100000).toFixed(1)}L</td>
-                      <td className="px-4 py-3 text-slate-600">{new Date(contract.contractExpiryDate).toLocaleDateString('en-IN')}</td>
+                      <td className="px-4 py-3 text-slate-600">{formatDate(contract.contractExpiryDate)}</td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5 font-bold text-slate-900">
-                          <div className={`w-2 h-2 rounded-full ${getHealthColor(contract.health).split(' ')[0]}`}></div>
+                          <div className={`w-2 h-2 rounded-full ${getHealthBadgeClasses(contract.healthStatus).split(' ')[0]}`}></div>
                           {contract.daysRemaining}
                         </div>
                       </td>
@@ -296,7 +259,7 @@ export default function Contracts() {
                   ))}
                 </tbody>
               </table>
-              {filteredContracts.length === 0 && (
+              {contracts.length === 0 && (
                 <div className="p-12 text-center text-slate-500 flex flex-col items-center">
                   <Search className="h-10 w-10 text-slate-300 mb-3" />
                   <p className="font-medium text-slate-700">No contracts found</p>
@@ -306,7 +269,7 @@ export default function Contracts() {
               )}
             </div>
             <div className="p-4 border-t border-slate-100 flex justify-between items-center bg-slate-50">
-              <span className="text-sm font-medium text-slate-600">Showing {filteredContracts.length} results</span>
+              <span className="text-sm font-medium text-slate-600">Showing {contracts.length} results</span>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" disabled className="bg-white">Previous</Button>
                 <Button variant="outline" size="sm" disabled className="bg-white">Next</Button>
@@ -337,12 +300,12 @@ export default function Contracts() {
                       </div>
                       <div className="flex justify-between items-end">
                         <div className="text-xs text-slate-500 space-y-1">
-                          <div className="font-medium">Exp: {new Date(contract.contractExpiryDate).toLocaleDateString('en-IN')}</div>
+                          <div className="font-medium">Exp: {formatDate(contract.contractExpiryDate)}</div>
                           <div>RM: {contract.relationshipManager}</div>
                         </div>
                         <div className="text-right">
                           <div className="text-[10px] uppercase font-bold text-slate-400">Days Left</div>
-                          <div className={`font-black text-lg leading-none ${contract.health === 'critical' ? 'text-red-600' : 'text-orange-600'}`}>
+                          <div className={`font-black text-lg leading-none ${contract.healthStatus === 'critical' ? 'text-red-600' : 'text-orange-600'}`}>
                             {contract.daysRemaining}
                           </div>
                         </div>

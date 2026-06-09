@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
-import { mockContracts, getDaysRemaining, getHealthStatus } from "@/data/contracts";
+import { useAuth } from "@/hooks/useAuth";
+import { getContractsExpiringWithin } from "@/services/contractService";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -28,11 +28,7 @@ export default function Sidebar() {
   const [contractsExpanded, setContractsExpanded] = useState(true);
   const { user, logout } = useAuth();
 
-  const criticalAndHighRiskCount = mockContracts.filter(c => {
-    const days = getDaysRemaining(c.contractExpiryDate);
-    const health = getHealthStatus(days);
-    return health === "critical" || health === "high-risk";
-  }).length;
+  const criticalAndHighRiskCount = getContractsExpiringWithin(30).length;
 
   const navItems = [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },

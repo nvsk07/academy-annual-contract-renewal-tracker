@@ -20,6 +20,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Save, RefreshCw } from "lucide-react";
+import { ACADEMY_TYPES, EQUIPMENT_CATEGORIES, CONTRACT_STATUSES, SUPPLY_FREQUENCIES } from "@/constants/contractConstants";
+import { RELATIONSHIP_MANAGERS, DEPARTMENTS } from "@/constants/appConstants";
+import { formatRevisionPercent } from "@/utils/currencyUtils";
 
 const formSchema = z.object({
   academyName: z.string().min(2, "Academy name is required"),
@@ -47,16 +50,6 @@ const formSchema = z.object({
   department: z.string(),
   notes: z.string(),
 });
-
-const equipmentOptions = [
-  "Cricket Equipment", 
-  "Football Equipment", 
-  "Badminton Equipment", 
-  "Basketball Equipment",
-  "Sports Apparel", 
-  "Training Accessories", 
-  "Fitness Equipment"
-];
 
 export default function ContractNew() {
   const { toast } = useToast();
@@ -91,10 +84,7 @@ export default function ContractNew() {
 
   const prevValue = form.watch("previousContractValue");
   const currValue = form.watch("currentContractValue");
-  
-  const priceRevisionPercent = prevValue > 0 
-    ? (((currValue - prevValue) / prevValue) * 100).toFixed(1)
-    : 0;
+  const priceRevisionPercent = formatRevisionPercent(prevValue, currValue);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -150,11 +140,9 @@ export default function ContractNew() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Cricket Academy">Cricket Academy</SelectItem>
-                        <SelectItem value="Football Academy">Football Academy</SelectItem>
-                        <SelectItem value="Badminton Academy">Badminton Academy</SelectItem>
-                        <SelectItem value="Basketball Academy">Basketball Academy</SelectItem>
-                        <SelectItem value="Multi Sports Academy">Multi Sports Academy</SelectItem>
+                        {ACADEMY_TYPES.map(type => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -274,8 +262,9 @@ export default function ContractNew() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Renewed">Renewed</SelectItem>
+                        {CONTRACT_STATUSES.map(s => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -326,7 +315,7 @@ export default function ContractNew() {
                       <FormDescription>Select all that apply for this contract</FormDescription>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {equipmentOptions.map((item) => (
+                      {EQUIPMENT_CATEGORIES.map((item) => (
                         <FormField
                           key={item}
                           control={form.control}
@@ -391,9 +380,9 @@ export default function ContractNew() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Monthly">Monthly</SelectItem>
-                          <SelectItem value="Quarterly">Quarterly</SelectItem>
-                          <SelectItem value="Annually">Annually</SelectItem>
+                          {SUPPLY_FREQUENCIES.map(f => (
+                            <SelectItem key={f} value={f}>{f}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -437,8 +426,8 @@ export default function ContractNew() {
               />
               <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col justify-center h-10 mt-2">
                 <span className="text-xs text-slate-500 uppercase font-semibold">Revision</span>
-                <div className={`font-bold text-lg ${Number(priceRevisionPercent) > 0 ? 'text-green-600' : Number(priceRevisionPercent) < 0 ? 'text-red-600' : 'text-slate-700'}`}>
-                  {Number(priceRevisionPercent) > 0 ? '+' : ''}{priceRevisionPercent}%
+                <div className={`font-bold text-lg ${priceRevisionPercent.startsWith('+') && priceRevisionPercent !== '+0.0%' ? 'text-green-600' : priceRevisionPercent.startsWith('-') ? 'text-red-600' : 'text-slate-700'}`}>
+                  {priceRevisionPercent}
                 </div>
               </div>
             </CardContent>
@@ -463,10 +452,9 @@ export default function ContractNew() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Priya Sharma">Priya Sharma</SelectItem>
-                          <SelectItem value="Arjun Mehta">Arjun Mehta</SelectItem>
-                          <SelectItem value="Sneha Patel">Sneha Patel</SelectItem>
-                          <SelectItem value="Vikram Singh">Vikram Singh</SelectItem>
+                          {RELATIONSHIP_MANAGERS.map(rm => (
+                            <SelectItem key={rm.name} value={rm.name}>{rm.name}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -479,9 +467,18 @@ export default function ContractNew() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Department</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {DEPARTMENTS.map(d => (
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

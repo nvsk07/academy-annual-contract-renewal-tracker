@@ -1,42 +1,34 @@
-import { Link, useParams } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockContracts, getDaysRemaining } from "@/data/contracts";
+import { getContractById } from "@/services/contractService";
 import { mockActivity } from "@/data/activity";
 import HealthBadge from "@/components/HealthBadge";
 import RenewalTimeline from "@/components/RenewalTimeline";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, Edit, Printer, Download, MapPin, Phone, Mail, User, 
-  Calendar, CheckCircle, TrendingUp, IndianRupee, Clock,
-  Activity, Archive, Plus, AlertCircle, RefreshCw, FileText,
-  Bell
+  Calendar, TrendingUp, IndianRupee, Activity, Archive, Plus, AlertCircle, RefreshCw, FileText, Bell
 } from "lucide-react";
+import { getStatusBadgeClasses, getRenewalStageIndex } from "@/utils/contractUtils";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function ContractDetail() {
   const { id } = useParams<{ id: string }>();
-  const contract = mockContracts.find(c => c.id === id) || mockContracts[0];
+  const contract = getContractById(id || "");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
-  const daysRemaining = getDaysRemaining(contract.contractExpiryDate);
+  if (!contract) {
+    setLocation("/contracts");
+    return null;
+  }
+
   const increase = ((contract.currentContractValue - contract.previousContractValue) / contract.previousContractValue) * 100;
 
   const getStatusBadge = (status: string) => {
-    switch(status) {
-      case "Active": return <Badge className="bg-green-100 text-green-800 border-none shadow-none px-3">Active</Badge>;
-      case "Expiring Soon": return <Badge className="bg-orange-100 text-orange-800 border-none shadow-none px-3">Expiring Soon</Badge>;
-      case "Renewed": return <Badge className="bg-blue-100 text-blue-800 border-none shadow-none px-3">Renewed</Badge>;
-      case "Archived": return <Badge className="bg-slate-100 text-slate-800 border-none shadow-none px-3">Archived</Badge>;
-      default: return <Badge>{status}</Badge>;
-    }
-  };
-
-  const getStageFromStatus = () => {
-    if (contract.status === "Active") return 1;
-    if (contract.status === "Expiring Soon") return 2;
-    if (contract.status === "Renewed" || contract.status === "Archived") return 4;
-    return 0;
+    return <Badge className={`${getStatusBadgeClasses(status)} border-none shadow-none px-3`}>{status}</Badge>;
   };
 
   const handleAction = (action: string) => {
@@ -60,7 +52,7 @@ export default function ContractDetail() {
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">{contract.academyName}</h1>
               {getStatusBadge(contract.status)}
-              <HealthBadge daysRemaining={daysRemaining} />
+              <HealthBadge daysRemaining={contract.daysRemaining} />
             </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
               <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md font-mono text-slate-700">
@@ -76,7 +68,7 @@ export default function ContractDetail() {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-                <span className="font-bold text-slate-900">{daysRemaining}</span> days remaining
+                <span className="font-bold text-slate-900">{contract.daysRemaining}</span> days remaining
               </div>
             </div>
           </div>
@@ -140,11 +132,11 @@ export default function ContractDetail() {
             <div className="divide-y divide-slate-100">
               <div className="flex justify-between items-center p-4">
                 <span className="text-sm font-medium text-slate-500">Start Date</span>
-                <span className="font-bold text-slate-900">{new Date(contract.contractStartDate).toLocaleDateString('en-IN')}</span>
+                <span className="font-bold text-slate-900">{formatDate(contract.contractStartDate)}</span>
               </div>
               <div className="flex justify-between items-center p-4 bg-orange-50/30">
                 <span className="text-sm font-medium text-slate-500">Expiry Date</span>
-                <span className="font-bold text-slate-900">{new Date(contract.contractExpiryDate).toLocaleDateString('en-IN')}</span>
+                <span className="font-bold text-slate-900">{formatDate(contract.contractExpiryDate)}</span>
               </div>
               <div className="flex justify-between items-center p-4">
                 <span className="text-sm font-medium text-slate-500">Duration</span>
@@ -198,7 +190,7 @@ export default function ContractDetail() {
           <CardTitle className="text-base font-bold">Renewal Timeline</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <RenewalTimeline currentStage={getStageFromStatus()} />
+          <RenewalTimeline currentStage={getRenewalStageIndex(contract.status)} />
         </CardContent>
       </Card>
 

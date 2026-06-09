@@ -1,10 +1,10 @@
 import { Badge } from "@/components/ui/badge";
-import { getHealthLabel, getHealthColor, getHealthStatus } from "@/data/contracts";
+import { getHealthLabel, getHealthBadgeClasses } from "@/utils/contractUtils";
 
 export default function HealthBadge({ daysRemaining }: { daysRemaining: number }) {
-  const status = getHealthStatus(daysRemaining);
+  const status = daysRemaining < 7 ? "critical" : daysRemaining < 30 ? "high-risk" : daysRemaining < 90 ? "attention" : "healthy";
   const label = getHealthLabel(status);
-  const colorClass = getHealthColor(status);
+  const colorClass = getHealthBadgeClasses(status);
   
   return (
     <Badge className={`${colorClass} border-none shadow-none font-medium px-2 py-0.5 whitespace-nowrap`}>

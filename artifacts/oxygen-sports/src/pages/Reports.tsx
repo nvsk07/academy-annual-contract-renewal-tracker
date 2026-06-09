@@ -4,12 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileBarChart, Download, Printer, Filter } from "lucide-react";
-import { mockContracts } from "@/data/contracts";
+import { getAllContracts } from "@/services/contractService";
+import { getExpiringContractReport } from "@/services/reportService";
 import { useToast } from "@/hooks/use-toast";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function Reports() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("summary");
+  const contracts = getAllContracts();
 
   const handleExport = () => {
     toast({ title: "Exporting", description: "Export feature will be available with backend integration." });
@@ -29,7 +32,7 @@ export default function Reports() {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {mockContracts.map(c => (
+          {contracts.map(c => (
             <tr key={c.id} className="hover:bg-slate-50">
               <td className="px-4 py-3 font-medium text-slate-900">{c.id}</td>
               <td className="px-4 py-3 font-semibold text-slate-900">{c.academyName}</td>
@@ -45,9 +48,7 @@ export default function Reports() {
   );
 
   const renderExpiring = () => {
-    const expiring = [...mockContracts]
-      .filter(c => c.status === "Expiring Soon")
-      .sort((a, b) => new Date(a.contractExpiryDate).getTime() - new Date(b.contractExpiryDate).getTime());
+    const expiring = getExpiringContractReport(contracts);
       
     return (
       <div className="overflow-x-auto">
@@ -65,7 +66,7 @@ export default function Reports() {
             {expiring.map(c => (
               <tr key={c.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-semibold text-slate-900">{c.academyName}</td>
-                <td className="px-4 py-3 text-red-600 font-bold">{new Date(c.contractExpiryDate).toLocaleDateString('en-IN')}</td>
+                <td className="px-4 py-3 text-red-600 font-bold">{formatDate(c.contractExpiryDate)}</td>
                 <td className="px-4 py-3 text-slate-900 font-medium">₹{(c.currentContractValue/100000).toFixed(1)}L</td>
                 <td className="px-4 py-3 text-slate-600">{c.relationshipManager}</td>
                 <td className="px-4 py-3 text-blue-600">{c.email}</td>

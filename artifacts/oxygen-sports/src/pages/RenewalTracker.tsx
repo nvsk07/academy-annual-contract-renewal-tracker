@@ -1,23 +1,18 @@
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockContracts, getDaysRemaining } from "@/data/contracts";
+import { getAllContracts } from "@/services/contractService";
 import HealthBadge from "@/components/HealthBadge";
 import RenewalTimeline from "@/components/RenewalTimeline";
 import { Button } from "@/components/ui/button";
+import { getRenewalStageIndex } from "@/utils/contractUtils";
 
 const STAGES = ["Contract Created", "Active", "Reminder Sent", "Negotiation", "Renewed"];
 
 export default function RenewalTracker() {
-  const contractsWithComputed = mockContracts.map(c => {
-    let stage = 0;
-    if (c.status === "Active") stage = 1;
-    if (c.status === "Expiring Soon") stage = 2;
-    if (c.status === "Renewed" || c.status === "Archived") stage = 4;
-    
+  const contractsWithComputed = getAllContracts().map(c => {
     return {
       ...c,
-      daysRemaining: getDaysRemaining(c.contractExpiryDate),
-      stage
+      stage: getRenewalStageIndex(c.status)
     };
   });
 
