@@ -24,12 +24,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useContracts } from "@/hooks/useContracts";
+import { useAuth } from "@/hooks/useAuth";
 import { getHealthBadgeClasses, getStatusBadgeClasses } from "@/utils/contractUtils";
 import { formatCurrency } from "@/utils/currencyUtils";
 import { formatDate } from "@/utils/dateUtils";
 import { CONTRACT_STATUSES, ACADEMY_TYPES } from "@/constants/contractConstants";
 
 export default function Contracts() {
+  const { user } = useAuth();
   const { toast } = useToast();
   const { contracts, allContracts, filters, setFilter, clearFilters } = useContracts();
 
@@ -124,17 +126,19 @@ export default function Contracts() {
                     </SelectContent>
                   </Select>
 
-                  <Select value={filters.relationshipManager} onValueChange={(v) => setFilter("relationshipManager", v)}>
-                    <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Relationship Manager" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All">All Managers</SelectItem>
-                      {uniqueRMs.map(rm => (
-                        <SelectItem key={rm} value={rm}>{rm}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {user?.role === 'admin' && (
+                    <Select value={filters.relationshipManager} onValueChange={(v) => setFilter("relationshipManager", v)}>
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Relationship Manager" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All">All Managers</SelectItem>
+                        {uniqueRMs.map(rm => (
+                          <SelectItem key={rm} value={rm}>{rm}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
 
                   <Select value={filters.academyType} onValueChange={(v) => setFilter("academyType", v)}>
                     <SelectTrigger className="bg-white">

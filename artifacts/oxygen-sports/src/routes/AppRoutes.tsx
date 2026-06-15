@@ -11,10 +11,10 @@ import Alerts from "@/pages/Alerts";
 import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";
 import RenewalTracker from "@/pages/RenewalTracker";
-import RelationshipManagers from "@/pages/RelationshipManagers";
 import NotFound from "@/pages/not-found";
 import Unauthorized from "@/pages/Unauthorized";
 import ServerError from "@/pages/ServerError";
+import UserManagement from "@/pages/UserManagement";
 
 export default function AppRoutes() {
   return (
@@ -31,11 +31,11 @@ export default function AppRoutes() {
               <Route path="/contracts/new" component={ContractNew} />
               <Route path="/contracts/renewal-tracker" component={RenewalTracker} />
               <Route path="/contracts/:id" component={ContractDetail} />
-              <Route path="/relationship-managers" component={RelationshipManagers} />
               <Route path="/analytics" component={Analytics} />
               <Route path="/reports" component={Reports} />
               <Route path="/alerts" component={Alerts} />
               <Route path="/settings" component={Settings} />
+              <Route path="/admin/users" component={UserManagement} />
               <Route component={NotFound} />
             </Switch>
           </AppLayout>

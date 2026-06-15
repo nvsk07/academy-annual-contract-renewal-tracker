@@ -5,21 +5,41 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { getContractsSortedByUrgency, ContractWithHealth } from "@/services/contractService";
-import { Clock, Calendar, Mail } from "lucide-react";
+import { getVisibleContractsSortedByUrgency, ContractWithHealth } from "@/services/contractService";
+import { useAuth } from "@/hooks/useAuth";
+import { Clock, Calendar, Mail, CheckCircle2 } from "lucide-react";
 import HealthBadge from "@/components/HealthBadge";
 import { getPriorityLabel, getHealthBorderClass } from "@/utils/contractUtils";
 import { formatDate } from "@/utils/dateUtils";
 
 export default function Alerts() {
+  const { user } = useAuth();
   const [acknowledged, setAcknowledged] = useState<Record<string, boolean>>({});
 
-  const alertsData = getContractsSortedByUrgency()
+  const alertsData = getVisibleContractsSortedByUrgency(user)
     .filter(c => c.daysRemaining < 90)
     .map(c => ({
       ...c,
       priorityLabel: getPriorityLabel(c.daysRemaining)
     }));
+
+  if (alertsData.length === 0) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Alerts Center</h1>
+            <p className="text-slate-500 text-sm">Prioritized contract renewals requiring attention</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
+          <CheckCircle2 className="h-16 w-16 text-green-500" />
+          <h2 className="text-2xl font-bold text-slate-900">No renewal alerts at this time.</h2>
+          <p className="text-slate-500">All contracts are healthy.</p>
+        </div>
+      </div>
+    );
+  }
 
   const criticalCount = alertsData.filter(a => a.priorityLabel === "Critical").length;
   const highCount = alertsData.filter(a => a.priorityLabel === "High").length;

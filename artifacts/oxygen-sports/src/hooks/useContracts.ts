@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { getAllContracts, ContractWithHealth } from "@/services/contractService";
+import { getVisibleContracts, ContractWithHealth } from "@/services/contractService";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface FilterState {
   search: string;
@@ -11,6 +12,7 @@ export interface FilterState {
 }
 
 export function useContracts() {
+  const { user } = useAuth();
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     status: "All",
@@ -22,7 +24,7 @@ export function useContracts() {
   
   const [isLoading, setIsLoading] = useState(false);
 
-  const allContracts = useMemo(() => getAllContracts(), []);
+  const allContracts = useMemo(() => getVisibleContracts(user), [user]);
 
   const setFilter = (key: keyof FilterState, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));

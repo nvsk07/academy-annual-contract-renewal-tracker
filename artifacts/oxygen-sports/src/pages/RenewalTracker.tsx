@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAllContracts } from "@/services/contractService";
+import { getVisibleContracts } from "@/services/contractService";
+import { useAuth } from "@/hooks/useAuth";
 import HealthBadge from "@/components/HealthBadge";
 import RenewalTimeline from "@/components/RenewalTimeline";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,8 @@ import { getRenewalStageIndex } from "@/utils/contractUtils";
 const STAGES = ["Contract Created", "Active", "Reminder Sent", "Negotiation", "Renewed"];
 
 export default function RenewalTracker() {
-  const contractsWithComputed = getAllContracts().map(c => {
+  const { user } = useAuth();
+  const contractsWithComputed = getVisibleContracts(user).map(c => {
     return {
       ...c,
       stage: getRenewalStageIndex(c.status)

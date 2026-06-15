@@ -3,14 +3,26 @@ import {
   PieChart, Pie, Cell, Legend
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAllContracts } from "@/services/contractService";
-import { getRMPerformance, getEquipmentCategoryBreakdown, getContractSummaryStats } from "@/services/reportService";
-import { Target, TrendingUp, Activity, Users, Database } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { getVisibleContracts } from "@/services/contractService";
+import { getEquipmentCategoryBreakdown } from "@/services/reportService";
+import { useAuth } from "@/hooks/useAuth";
+import HealthBadge from "@/components/HealthBadge";
+import { Info } from "lucide-react";
 
 export default function Analytics() {
-  const contracts = getAllContracts();
+  const { user } = useAuth();
+  const contracts = getVisibleContracts(user);
   
+  if (contracts.length === 0) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto h-[60vh] flex flex-col items-center justify-center">
+        <Info className="h-16 w-16 text-slate-300 mb-4" />
+        <h2 className="text-2xl font-bold text-slate-900">No data available for visualization.</h2>
+        <p className="text-slate-500 text-sm">Create contracts to see analytics.</p>
+      </div>
+    );
+  }
+
   // Compute Status Distribution
   const statusCounts = contracts.reduce((acc, curr) => {
     acc[curr.status] = (acc[curr.status] || 0) + 1;
@@ -30,77 +42,11 @@ export default function Analytics() {
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count);
 
-  // Compute RM Performance Leaderboard
-  const rmStats = getRMPerformance(contracts);
-  const rmPerformance = rmStats
-    .map((rm) => {
-      const rmContracts = contracts.filter(c => c.relationshipManager === rm.name);
-      const totalValue = rmContracts.reduce((acc, c) => acc + c.currentContractValue, 0);
-      return {
-        name: rm.name,
-        contracts: rm.total,
-        valueFormatted: `₹${(totalValue / 100000).toFixed(1)}L`,
-        progress: Math.min(100, Math.round((totalValue / 2000000) * 100)) // Fake target
-      };
-    })
-    .sort((a, b) => b.contracts - a.contracts);
-
-  const { totalValue } = getContractSummaryStats(contracts);
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Analytics Dashboard</h1>
-        <p className="text-slate-500 text-sm">Portfolio performance and contract metrics derived from current data</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
-              <Target className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Value</p>
-              <h3 className="text-2xl font-black">₹{(totalValue / 100000).toFixed(1)}L</h3>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 bg-green-100 text-green-600 rounded-lg">
-              <TrendingUp className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Avg Contract</p>
-              <h3 className="text-2xl font-black">₹{((totalValue / (contracts.length || 1)) / 100000).toFixed(1)}L</h3>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 bg-orange-100 text-orange-600 rounded-lg">
-              <Activity className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Renewal Rate</p>
-              <h3 className="text-2xl font-black">
-                {Math.round((statusCounts['Renewed'] || 0) / (contracts.length || 1) * 100)}%
-              </h3>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 bg-purple-100 text-purple-600 rounded-lg">
-              <Users className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Academies</p>
-              <h3 className="text-2xl font-black">{contracts.length}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <p className="text-slate-500 text-sm">Portfolio distribution across all visible contracts</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -153,55 +99,37 @@ export default function Analytics() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 shadow-sm">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/50">
-            <CardTitle className="text-base font-bold">RM Performance Leaderboard</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
+      <Card className="shadow-sm">
+        <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+          <CardTitle className="text-base font-bold">Contract Summary</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
             <table className="w-full text-sm text-left whitespace-nowrap">
-              <thead className="bg-white text-slate-500 border-b border-slate-100">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
                 <tr>
-                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs">RM Name</th>
-                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs text-center">Contracts</th>
-                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs text-right">Portfolio Value</th>
-                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs">Relative Score</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs">Academy</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs">Status</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs">Health</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs text-center">Days Remaining</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-xs">RM</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {rmPerformance.map((rm) => (
-                  <tr key={rm.name} className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4 font-bold text-slate-900">{rm.name}</td>
-                    <td className="px-6 py-4 text-center font-medium text-slate-600">{rm.contracts}</td>
-                    <td className="px-6 py-4 text-right font-bold text-slate-900">{rm.valueFormatted}</td>
-                    <td className="px-6 py-4 w-1/3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-full bg-slate-100 rounded-full h-2">
-                          <div 
-                            className="h-2 rounded-full bg-blue-500" 
-                            style={{width: `${rm.progress}%`}}
-                          ></div>
-                        </div>
-                      </div>
-                    </td>
+                {contracts.slice(0, 10).map((c) => (
+                  <tr key={c.id} className="hover:bg-slate-50/50">
+                    <td className="px-6 py-4 font-bold text-slate-900">{c.academyName}</td>
+                    <td className="px-6 py-4 font-medium text-slate-600">{c.status}</td>
+                    <td className="px-6 py-4"><HealthBadge daysRemaining={c.daysRemaining} /></td>
+                    <td className="px-6 py-4 text-center font-bold text-slate-900">{c.daysRemaining}</td>
+                    <td className="px-6 py-4 text-slate-600">{c.relationshipManager}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-dashed border-2">
-          <CardContent className="p-8 h-full flex flex-col items-center justify-center text-center">
-            <div className="bg-slate-100 p-4 rounded-full mb-4">
-              <Database className="h-8 w-8 text-slate-400" />
-            </div>
-            <h3 className="font-bold text-slate-900 mb-2">Time-Series Data Unavailable</h3>
-            <p className="text-sm text-slate-500 mb-6">Connect backend data to unlock Monthly Renewals Trend and Revenue Retention charts.</p>
-            <Button variant="outline" className="bg-white shadow-sm font-semibold text-slate-700">Configure Integration</Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

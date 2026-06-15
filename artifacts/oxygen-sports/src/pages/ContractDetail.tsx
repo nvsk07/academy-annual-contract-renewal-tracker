@@ -2,7 +2,9 @@ import { Link, useParams, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getContractById } from "@/services/contractService";
+import { getVisibleContractById } from "@/services/contractService";
+import { useAuth } from "@/hooks/useAuth";
+import Unauthorized from "@/pages/Unauthorized";
 import { mockActivity } from "@/data/activity";
 import HealthBadge from "@/components/HealthBadge";
 import RenewalTimeline from "@/components/RenewalTimeline";
@@ -15,14 +17,14 @@ import { getStatusBadgeClasses, getRenewalStageIndex } from "@/utils/contractUti
 import { formatDate } from "@/utils/dateUtils";
 
 export default function ContractDetail() {
+  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
-  const contract = getContractById(id || "");
+  const contract = getVisibleContractById(user, id || "");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   if (!contract) {
-    setLocation("/contracts");
-    return null;
+    return <Unauthorized />;
   }
 
   const increase = ((contract.currentContractValue - contract.previousContractValue) / contract.previousContractValue) * 100;

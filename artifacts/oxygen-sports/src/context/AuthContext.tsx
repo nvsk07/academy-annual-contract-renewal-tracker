@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+/**
+ * AuthContext — currently uses local credential validation via authService.
+ * Replace validateCredentials() with Firebase Auth signInWithEmailAndPassword()
+ * and loadSession()/persistSession() with onAuthStateChanged() when
+ * Firebase integration is added.
+ */
+import { createContext, useState, useEffect, ReactNode } from "react";
 import { validateCredentials, persistSession, loadSession, clearSession, AuthUser } from "@/services/authService";
 
 interface AuthContextType {
@@ -8,7 +14,8 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export type { AuthContextType };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -53,10 +60,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-}

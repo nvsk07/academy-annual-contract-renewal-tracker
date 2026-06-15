@@ -3,16 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileBarChart, Download, Printer, Filter } from "lucide-react";
-import { getAllContracts } from "@/services/contractService";
+import { FileBarChart, Download, Printer, Filter, Info } from "lucide-react";
+import { getVisibleContracts } from "@/services/contractService";
 import { getExpiringContractReport } from "@/services/reportService";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/utils/dateUtils";
 
 export default function Reports() {
+  const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("summary");
-  const contracts = getAllContracts();
+  const contracts = getVisibleContracts(user);
+
+  if (contracts.length === 0) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto h-[60vh] flex flex-col items-center justify-center">
+        <Info className="h-16 w-16 text-slate-300 mb-4" />
+        <h2 className="text-2xl font-bold text-slate-900">No reports available.</h2>
+        <p className="text-slate-500 text-sm">Create contracts to generate reports.</p>
+      </div>
+    );
+  }
 
   const handleExport = () => {
     toast({ title: "Exporting", description: "Export feature will be available with backend integration." });
@@ -27,7 +39,6 @@ export default function Reports() {
             <th className="px-4 py-3 font-semibold">Academy</th>
             <th className="px-4 py-3 font-semibold">Type</th>
             <th className="px-4 py-3 font-semibold">Status</th>
-            <th className="px-4 py-3 font-semibold">Value</th>
             <th className="px-4 py-3 font-semibold">RM</th>
           </tr>
         </thead>
@@ -38,7 +49,6 @@ export default function Reports() {
               <td className="px-4 py-3 font-semibold text-slate-900">{c.academyName}</td>
               <td className="px-4 py-3 text-slate-600">{c.academyType}</td>
               <td className="px-4 py-3 font-medium text-slate-700">{c.status}</td>
-              <td className="px-4 py-3 text-slate-900 font-medium">₹{(c.currentContractValue/100000).toFixed(1)}L</td>
               <td className="px-4 py-3 text-slate-600">{c.relationshipManager}</td>
             </tr>
           ))}
@@ -57,7 +67,6 @@ export default function Reports() {
             <tr>
               <th className="px-4 py-3 font-semibold">Academy</th>
               <th className="px-4 py-3 font-semibold">Expiry Date</th>
-              <th className="px-4 py-3 font-semibold">Current Value</th>
               <th className="px-4 py-3 font-semibold">RM</th>
               <th className="px-4 py-3 font-semibold">Contact Email</th>
             </tr>
@@ -67,7 +76,6 @@ export default function Reports() {
               <tr key={c.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-semibold text-slate-900">{c.academyName}</td>
                 <td className="px-4 py-3 text-red-600 font-bold">{formatDate(c.contractExpiryDate)}</td>
-                <td className="px-4 py-3 text-slate-900 font-medium">₹{(c.currentContractValue/100000).toFixed(1)}L</td>
                 <td className="px-4 py-3 text-slate-600">{c.relationshipManager}</td>
                 <td className="px-4 py-3 text-blue-600">{c.email}</td>
               </tr>

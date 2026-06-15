@@ -1,0 +1,498 @@
+I want to redesign the architecture and business workflow of this application to match a real-world Oxygen Sports contract management system.
+
+Do NOT make this a demo dashboard.
+
+Do NOT show fake data, fake users, fake relationship managers, fake renewal rates, fake percentages, fake KPIs, fake revenue numbers, fake analytics, or fake charts.
+
+This application must behave like a real business application.
+
+=====================================================
+
+BUSINESS MODEL
+
+Oxygen Sports supplies sports equipment to academies.
+
+Contracts are assigned to a specific Relationship Manager.
+
+A Relationship Manager should ONLY see contracts assigned to them.
+
+Administrators should see all contracts and all users.
+
+=====================================================
+
+REMOVE CURRENT RELATIONSHIP MANAGERS PAGE
+
+Delete the existing Relationship Managers page completely.
+
+The current implementation showing multiple managers, renewal rates, contract counts, portfolio cards, and performance metrics is unrealistic and based on fake data.
+
+Remove:
+
+* Relationship Manager cards
+* Renewal Rate percentages
+* Portfolio metrics
+* Manager performance widgets
+* Manager analytics
+* Fake manager statistics
+
+=====================================================
+
+NEW USER MANAGEMENT MODEL
+
+Relationship Manager is not a separate analytics module.
+
+Relationship Manager should only exist as a user role and as a field inside a contract.
+
+Example:
+
+Contract:
+
+Academy Name:
+ABC Cricket Academy
+
+Relationship Manager:
+Nanda Vardhan
+
+This means the contract belongs to that user.
+
+=====================================================
+
+IMPLEMENT ROLE-BASED AUTHENTICATION
+
+Create a professional Login Page.
+
+Fields:
+
+Employee ID
+Password
+
+Features:
+
+Show Password Toggle
+Remember Me
+Forgot Password
+Validation
+Loading State
+
+=====================================================
+
+USER ROLES
+
+ROLE 1
+
+Admin
+
+Permissions:
+
+View All Contracts
+
+Create Contracts
+
+Edit Contracts
+
+Delete Contracts
+
+Manage Users
+
+View Reports
+
+View Alerts
+
+Manage Settings
+
+=====================================================
+
+ROLE 2
+
+Relationship Manager
+
+Permissions:
+
+View Assigned Contracts Only
+
+Create Contracts
+
+Edit Own Contracts
+
+View Own Alerts
+
+View Own Reports
+
+Cannot View Other Managers' Contracts
+
+Cannot Access User Management
+
+Cannot Access Settings
+
+=====================================================
+
+PROTECTED ROUTES
+
+Unauthenticated users must never access:
+
+Dashboard
+Contracts
+Reports
+Alerts
+Settings
+User Management
+
+Redirect unauthenticated users to Login Page.
+
+=====================================================
+
+USER MANAGEMENT PAGE (ADMIN ONLY)
+
+Create a new page:
+
+User Management
+
+Admin can:
+
+Create User
+
+Edit User
+
+Deactivate User
+
+Reset Password
+
+Assign Role
+
+Fields:
+
+Employee ID
+
+Full Name
+
+Email
+
+Role
+
+Status
+
+=====================================================
+
+CONTRACT OWNERSHIP MODEL
+
+Each contract must contain:
+
+academy_name
+
+academy_type
+
+relationship_manager_id
+
+relationship_manager_name
+
+contract_start_date
+
+contract_end_date
+
+contract_status
+
+equipment_category
+
+contract_value
+
+notes
+
+created_at
+
+updated_at
+
+=====================================================
+
+ROLE-BASED CONTRACT VISIBILITY
+
+Admin Login:
+
+See all contracts.
+
+Relationship Manager Login:
+
+Only see contracts assigned to their account.
+
+Example:
+
+Logged in User:
+
+Nanda Vardhan
+
+Only show:
+
+ABC Cricket Academy
+
+XYZ Football Academy
+
+Future Stars Academy
+
+Do NOT show contracts assigned to other managers.
+
+=====================================================
+
+REBUILD DASHBOARD LOGIC
+
+Dashboard should be completely data-driven.
+
+If no contracts exist:
+
+Show Empty State.
+
+Example:
+
+"No Contracts Found"
+
+"Create your first academy contract to begin."
+
+Button:
+
+Create Contract
+
+=====================================================
+
+DO NOT SHOW
+
+Revenue
+
+Growth %
+
+Renewal %
+
+Trend %
+
+Performance %
+
+Any business metric that does not exist.
+
+=====================================================
+
+ONLY SHOW
+
+Total Contracts
+
+Active Contracts
+
+Expiring Soon
+
+Renewed Contracts
+
+And only when real contract records exist.
+
+=====================================================
+
+CHARTS
+
+If there is no data:
+
+Show:
+
+"No data available for visualization."
+
+Do not render fake charts.
+
+When contracts exist:
+
+Generate chart data dynamically from actual records.
+
+=====================================================
+
+ALERTS
+
+Create a contract health system.
+
+Healthy
+
+90+ days remaining
+
+Green
+
+=====================================================
+
+Attention Required
+
+30–90 days remaining
+
+Yellow
+
+=====================================================
+
+High Risk
+
+7–30 days remaining
+
+Orange
+
+=====================================================
+
+Critical
+
+Less than 7 days remaining
+
+Red
+
+=====================================================
+
+ALERTS PAGE
+
+Show contracts that need attention.
+
+If none exist:
+
+"No renewal alerts at this time."
+
+=====================================================
+
+REPORTS PAGE
+
+If no contracts exist:
+
+"No reports available."
+
+Generate reports only from actual contract data.
+
+=====================================================
+
+CONTRACT DETAIL PAGE
+
+Display:
+
+Academy Information
+
+Contract Information
+
+Equipment Information
+
+Relationship Manager
+
+Activity Timeline
+
+=====================================================
+
+RENEWAL WORKFLOW TIMELINE
+
+Created
+
+↓
+
+Active
+
+↓
+
+Reminder Sent
+
+↓
+
+Negotiation
+
+↓
+
+Renewed
+
+Display this timeline on contract details.
+
+=====================================================
+
+FRONTEND ARCHITECTURE
+
+Create reusable components.
+
+components/
+
+pages/
+
+layouts/
+
+hooks/
+
+services/
+
+utils/
+
+contexts/
+
+routes/
+
+=====================================================
+
+AUTHENTICATION PREPARATION
+
+Prepare the application for Firebase Authentication and Firestore integration.
+
+Create:
+
+Auth Context
+
+Protected Routes
+
+Role Guards
+
+Permission-Based Navigation
+
+Session Persistence
+
+Logout Flow
+
+=====================================================
+
+FIREBASE STRUCTURE PREPARATION
+
+Users Collection
+
+Contracts Collection
+
+Alerts Collection
+
+Reports Collection
+
+Design all components to consume real Firebase data later.
+
+=====================================================
+
+EMPTY STATES
+
+Create professional empty states for:
+
+Dashboard
+
+Contracts
+
+Reports
+
+Alerts
+
+Search Results
+
+Analytics
+
+=====================================================
+
+FINAL GOAL
+
+Transform this application from an AI-generated demo dashboard into a realistic enterprise contract management platform used internally by Oxygen Sports.
+
+Focus on:
+
+Role-Based Access Control
+
+Real Contract Ownership
+
+Authentication
+
+Clean Empty States
+
+Data-Driven UI
+
+Realistic Business Workflow
+
+Scalable Architecture
+
+Professional UX
+
+No Fake Data
+
+No Fake Analytics
+
+No Fake Relationship Manager Metrics
+
+No Fake Dashboard Statistics

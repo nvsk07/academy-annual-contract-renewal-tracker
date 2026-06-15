@@ -20,7 +20,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { getContractsExpiringWithin } from "@/services/contractService";
+import { getVisibleContractsExpiringWithin } from "@/services/contractService";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -28,9 +28,9 @@ export default function Sidebar() {
   const [contractsExpanded, setContractsExpanded] = useState(true);
   const { user, logout } = useAuth();
 
-  const criticalAndHighRiskCount = getContractsExpiringWithin(30).length;
+  const criticalAndHighRiskCount = getVisibleContractsExpiringWithin(user, 30).length;
 
-  const navItems = [
+  const allNavItems = [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
     { 
       label: "Contracts", 
@@ -41,12 +41,17 @@ export default function Sidebar() {
         { label: "Renewal Tracker", href: "/contracts/renewal-tracker", icon: RefreshCw },
       ]
     },
-    { label: "Relationship Managers", href: "/relationship-managers", icon: Users },
-    { label: "Analytics", href: "/analytics", icon: BarChart2 },
+    { label: "Analytics", href: "/analytics", icon: BarChart2, adminOnly: true },
     { label: "Reports", href: "/reports", icon: FileBarChart },
     { label: "Alerts Center", href: "/alerts", icon: BellRing, badge: criticalAndHighRiskCount },
+    { label: "User Management", href: "/admin/users", icon: Users, adminOnly: true },
     { label: "Settings", href: "/settings", icon: Settings },
   ];
+
+  const navItems = allNavItems.filter(item => {
+    if (item.adminOnly && user?.role !== "admin") return false;
+    return true;
+  });
 
   return (
     <>
