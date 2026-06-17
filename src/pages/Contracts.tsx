@@ -148,7 +148,7 @@ export default function Contracts() {
                   {user?.role === 'admin' ? (
                     <Select value={filters.relationshipManager} onValueChange={(v) => setFilter("relationshipManager", v)}>
                       <SelectTrigger className="bg-white border-slate-200">
-                        <SelectValue placeholder="Relationship Manager" />
+                        <SelectValue placeholder="relationship manager" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="All">All Managers</SelectItem>
@@ -212,8 +212,8 @@ export default function Contracts() {
                   <tr>
                     <th className="px-4 py-3 font-semibold w-[120px]">Contract ID</th>
                     <th className="px-4 py-3 font-semibold">Academy</th>
-                    {user?.role === 'admin' && <th className="px-4 py-3 font-semibold">RM</th>}
-                    <th className="px-4 py-3 font-semibold">Expiry Date</th>
+                    {user?.role === 'admin' && <th className="px-4 py-3 font-semibold">relationship manager</th>}
+                    <th className="px-4 py-3 font-semibold">renewal dates</th>
                     <th className="px-4 py-3 font-semibold text-center">Days</th>
                     <th className="px-4 py-3 font-semibold">Health</th>
                     <th className="px-4 py-3 font-semibold">Status</th>

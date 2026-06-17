@@ -89,9 +89,9 @@ export default function Reports() {
             <th className="px-4 py-3 font-semibold">Type</th>
             <th className="px-4 py-3 font-semibold">Status</th>
             <th className="px-4 py-3 font-semibold">Health</th>
-            <th className="px-4 py-3 font-semibold">End Date</th>
+            <th className="px-4 py-3 font-semibold">renewal dates</th>
             {user?.role === "admin" && (
-              <th className="px-4 py-3 font-semibold">Relationship Manager</th>
+              <th className="px-4 py-3 font-semibold">relationship manager</th>
             )}
           </tr>
         </thead>
@@ -132,10 +132,10 @@ export default function Reports() {
             <tr>
               <th className="px-4 py-3 font-semibold">Academy</th>
               <th className="px-4 py-3 font-semibold">Health</th>
-              <th className="px-4 py-3 font-semibold">Expiry Date</th>
+              <th className="px-4 py-3 font-semibold">renewal dates</th>
               <th className="px-4 py-3 font-semibold">Days Left</th>
               {user?.role === "admin" && (
-                <th className="px-4 py-3 font-semibold">Relationship Manager</th>
+                <th className="px-4 py-3 font-semibold">relationship manager</th>
               )}
               <th className="px-4 py-3 font-semibold">Contact Email</th>
             </tr>

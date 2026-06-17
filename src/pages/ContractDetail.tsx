@@ -141,7 +141,7 @@ export default function ContractDetail() {
               </div>
               <div className="flex items-center gap-1.5 font-semibold text-slate-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-                RM: <span className="font-bold text-slate-900">{contract.relationshipManagerName}</span>
+                relationship manager: <span className="font-bold text-slate-900">{contract.relationshipManagerName}</span>
               </div>
               <div className="flex items-center gap-1.5 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
@@ -243,7 +243,7 @@ export default function ContractDetail() {
                 <span className="font-bold text-slate-900">{formatDate(contract.contractStartDate)}</span>
               </div>
               <div className="flex justify-between items-center p-4 bg-orange-50/20">
-                <span className="text-sm font-semibold text-slate-500">Expiry Date</span>
+                <span className="text-sm font-semibold text-slate-500">renewal dates</span>
                 <span className="font-bold text-slate-900">{formatDate(contract.contractEndDate)}</span>
               </div>
               <div className="flex justify-between items-center p-4">
@@ -259,7 +259,7 @@ export default function ContractDetail() {
                 <span className="font-bold text-slate-900">₹{contract.contractValue?.toLocaleString('en-IN') || "0"}</span>
               </div>
               <div className="flex justify-between items-center p-4">
-                <span className="text-sm font-semibold text-slate-500">Price Revision</span>
+                <span className="text-sm font-semibold text-slate-500">price revision</span>
                 <span className={`font-bold ${contract.priceRevision > 0 ? 'text-green-600' : contract.priceRevision < 0 ? 'text-red-600' : 'text-slate-900'}`}>
                   {contract.priceRevision > 0 ? `+${contract.priceRevision}%` : `${contract.priceRevision}%`}
                 </span>
@@ -276,7 +276,7 @@ export default function ContractDetail() {
           </CardHeader>
           <CardContent className="p-5 space-y-5">
             <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Equipment Categories</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">equipment categories</div>
               <div className="flex flex-wrap gap-2">
                 {contract.equipmentCategories.map(cat => (
                   <Badge key={cat} variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none shadow-none font-semibold">{cat}</Badge>

@@ -428,7 +428,7 @@ export default function ContractNew() {
                 name="contractExpiryDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expiry Date*</FormLabel>
+                    <FormLabel>renewal dates*</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -455,7 +455,7 @@ export default function ContractNew() {
                 name="priceRevision"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price Revision (%)*</FormLabel>
+                    <FormLabel>price revision*</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="e.g. 5 for +5% or -2 for -2%" {...field} />
                     </FormControl>
@@ -479,7 +479,7 @@ export default function ContractNew() {
                 render={() => (
                   <FormItem>
                     <div className="mb-3">
-                      <FormLabel className="text-sm font-semibold">Equipment Categories*</FormLabel>
+                      <FormLabel className="text-sm font-semibold">equipment categories*</FormLabel>
                       <FormDescription>Select categories covered by this renewal contract</FormDescription>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -573,7 +573,7 @@ export default function ContractNew() {
                   name="relationshipManagerId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Relationship Manager*</FormLabel>
+                      <FormLabel>relationship manager*</FormLabel>
                       {user?.role === "relationship_manager" ? (
                         <FormControl>
                           <Input value={user.name} disabled className="bg-slate-100 text-slate-700 font-semibold border-slate-200" />
