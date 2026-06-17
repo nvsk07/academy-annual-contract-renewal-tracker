@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [visibleContracts, setVisibleContracts] = useState<ContractWithHealth[]>([]);
   const [needsAttention, setNeedsAttention] = useState<ContractWithHealth[]>([]);
   const [healthCounts, setHealthCounts] = useState<Record<HealthStatus, number>>({
+    expired: 0,
     critical: 0,
     "high-risk": 0,
     attention: 0,
@@ -121,7 +122,7 @@ export default function Dashboard() {
         </div>
         <Link href="/contracts/new">
           <Button className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
-            <Plus className="h-4 w-4 mr-2" /> Create Contract
+            <Plus className="h-4 w-4 mr-2" /> Create First Contract
           </Button>
         </Link>
       </div>
@@ -278,6 +279,7 @@ export default function Dashboard() {
         <CardContent className="p-5">
           <div className="flex flex-wrap gap-3">
             {[
+              { key: "expired", label: "Expired", sub: "Past end date", dot: "bg-slate-500", bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-900", sub_: "text-slate-600" },
               { key: "critical", label: "Critical", sub: "< 7 days", dot: "bg-red-500", bg: "bg-red-50", border: "border-red-100", text: "text-red-900", sub_: "text-red-700" },
               { key: "high-risk", label: "High Risk", sub: "7–30 days", dot: "bg-orange-500", bg: "bg-orange-50", border: "border-orange-100", text: "text-orange-900", sub_: "text-orange-700" },
               { key: "attention", label: "Attention", sub: "30–90 days", dot: "bg-yellow-500", bg: "bg-yellow-50", border: "border-yellow-100", text: "text-yellow-900", sub_: "text-yellow-700" },
@@ -341,7 +343,7 @@ export default function Dashboard() {
                         <HealthBadge daysRemaining={c.daysRemaining} />
                       </td>
                       <td className="px-4 py-3 text-slate-600 font-medium">{formatDate(c.contractEndDate)}</td>
-                      <td className="px-4 py-3 font-bold text-slate-900">{c.daysRemaining}</td>
+                      <td className="px-4 py-3 font-bold text-slate-900">{c.daysRemaining < 0 ? "Expired" : c.daysRemaining}</td>
                       {user?.role === "admin" && (
                         <td className="px-4 py-3 text-slate-600 font-medium">{c.relationshipManagerName}</td>
                       )}

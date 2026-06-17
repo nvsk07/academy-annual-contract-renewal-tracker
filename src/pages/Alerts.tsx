@@ -83,7 +83,7 @@ export default function Alerts() {
             <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Days Remaining</div>
               <div className={`text-2xl font-black ${alert.daysRemaining < 7 ? "text-red-600" : "text-slate-900"}`}>
-                {alert.daysRemaining}
+                {alert.daysRemaining < 0 ? "Expired" : alert.daysRemaining}
               </div>
             </div>
             <div className="bg-slate-50 border border-slate-100 rounded-lg p-3">
@@ -155,7 +155,7 @@ export default function Alerts() {
           <div className="h-16 w-16 rounded-full bg-green-50 flex items-center justify-center">
             <CheckCircle2 className="h-8 w-8 text-green-500" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">No renewal alerts at this time.</h2>
+          <h2 className="text-xl font-bold text-slate-900">No Alerts Available</h2>
           <p className="text-slate-500 text-sm">All contracts are healthy — no action required.</p>
         </div>
       ) : (

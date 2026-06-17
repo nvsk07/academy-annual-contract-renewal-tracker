@@ -395,7 +395,7 @@ export default function UserManagement() {
       ) : users.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-3">
           <Users className="h-12 w-12 text-slate-300" />
-          <h3 className="text-lg font-bold text-slate-700">No Users Found</h3>
+          <h3 className="text-lg font-bold text-slate-700">No Relationship Managers Found</h3>
           <p className="text-slate-500 text-sm">Add the first user to get started.</p>
         </div>
       ) : (

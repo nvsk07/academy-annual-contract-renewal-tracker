@@ -1,8 +1,9 @@
 import { HEALTH_THRESHOLDS } from "@/constants/contractConstants";
 
-export type HealthStatus = "healthy" | "attention" | "high-risk" | "critical";
+export type HealthStatus = "expired" | "healthy" | "attention" | "high-risk" | "critical";
 
 export function getHealthStatus(daysRemaining: number): HealthStatus {
+  if (daysRemaining < 0) return "expired";
   if (daysRemaining < HEALTH_THRESHOLDS.CRITICAL) return "critical";
   if (daysRemaining < HEALTH_THRESHOLDS.HIGH_RISK) return "high-risk";
   if (daysRemaining < HEALTH_THRESHOLDS.ATTENTION) return "attention";
@@ -11,6 +12,7 @@ export function getHealthStatus(daysRemaining: number): HealthStatus {
 
 export function getHealthLabel(health: HealthStatus): string {
   switch (health) {
+    case "expired": return "Expired";
     case "critical": return "Critical";
     case "high-risk": return "High Risk";
     case "attention": return "Attention Required";
@@ -21,6 +23,7 @@ export function getHealthLabel(health: HealthStatus): string {
 
 export function getHealthBadgeClasses(health: HealthStatus): string {
   switch (health) {
+    case "expired": return "bg-slate-200 text-slate-800";
     case "critical": return "bg-red-100 text-red-800";
     case "high-risk": return "bg-orange-100 text-orange-800";
     case "attention": return "bg-yellow-100 text-yellow-800";
@@ -31,6 +34,7 @@ export function getHealthBadgeClasses(health: HealthStatus): string {
 
 export function getHealthBorderClass(health: HealthStatus): string {
   switch (health) {
+    case "expired": return "border-slate-400";
     case "critical": return "border-red-500";
     case "high-risk": return "border-orange-500";
     case "attention": return "border-yellow-500";

@@ -235,7 +235,7 @@ export default function Contracts() {
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5 font-bold text-slate-900">
                           <div className={`w-2 h-2 rounded-full ${getHealthBadgeClasses(contract.healthStatus).split(' ')[0]}`}></div>
-                          {contract.daysRemaining}
+                          {contract.daysRemaining < 0 ? "Expired" : contract.daysRemaining}
                         </div>
                       </td>
                       <td className="px-4 py-3"><HealthBadge daysRemaining={contract.daysRemaining} /></td>
@@ -287,7 +287,7 @@ export default function Contracts() {
               {contracts.length === 0 && (
                 <div className="p-12 text-center text-slate-500 flex flex-col items-center">
                   <Search className="h-10 w-10 text-slate-300 mb-3" />
-                  <p className="font-bold text-slate-700">No contracts found</p>
+                  <p className="font-bold text-slate-700">No Search Results Found</p>
                   <p className="text-sm mt-1">Try adjusting your filters or search term.</p>
                   <Button variant="outline" className="mt-4" onClick={clearFilters}>Clear Filters</Button>
                 </div>
@@ -331,7 +331,7 @@ export default function Contracts() {
                         <div className="text-right">
                           <div className="text-[10px] uppercase font-bold text-slate-400">Days Left</div>
                           <div className={`font-black text-lg leading-none ${contract.healthStatus === 'critical' ? 'text-red-600' : 'text-orange-600'}`}>
-                            {contract.daysRemaining}
+                            {contract.daysRemaining < 0 ? "Expired" : contract.daysRemaining}
                           </div>
                         </div>
                       </div>

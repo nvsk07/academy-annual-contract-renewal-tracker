@@ -177,7 +177,7 @@ export async function getContractsExpiringWithin(
 export async function getHealthSummary(
   user: AuthUser | null
 ): Promise<Record<HealthStatus, number>> {
-  const summary: Record<HealthStatus, number> = { critical: 0, "high-risk": 0, attention: 0, healthy: 0 };
+  const summary: Record<HealthStatus, number> = { expired: 0, critical: 0, "high-risk": 0, attention: 0, healthy: 0 };
   const contracts = await getVisibleContracts(user);
   contracts
     .filter(c => c.status !== "Archived")

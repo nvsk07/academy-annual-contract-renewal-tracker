@@ -69,7 +69,7 @@ export default function Reports() {
         <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center">
           <Info className="h-8 w-8 text-slate-300" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900">No reports available.</h2>
+        <h2 className="text-2xl font-bold text-slate-900">No Reports Available</h2>
         <p className="text-slate-500 text-sm">Create contracts to generate reports.</p>
       </div>
     );
@@ -144,7 +144,7 @@ export default function Reports() {
                 <td className="px-4 py-3 font-semibold text-slate-900">{c.academyName}</td>
                 <td className="px-4 py-3"><HealthBadge daysRemaining={c.daysRemaining} /></td>
                 <td className="px-4 py-3 text-red-600 font-bold">{formatDate(c.contractEndDate)}</td>
-                <td className="px-4 py-3 font-bold text-slate-900">{c.daysRemaining}</td>
+                <td className="px-4 py-3 font-bold text-slate-900">{c.daysRemaining < 0 ? "Expired" : c.daysRemaining}</td>
                 {user?.role === "admin" && (
                   <td className="px-4 py-3 text-slate-600">{c.relationshipManagerName}</td>
                 )}

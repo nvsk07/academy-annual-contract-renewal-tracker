@@ -32,7 +32,6 @@ function initFirebaseAdmin() {
 const mockUsers = [
   {
     email: "admin@oxygensports.in",
-    password: "AdminPassword123!",
     employeeId: "ADMIN001",
     name: "Admin User",
     role: "admin",
@@ -43,7 +42,6 @@ const mockUsers = [
   },
   {
     email: "priya@oxygensports.in",
-    password: "RMPassword123!",
     employeeId: "RM001",
     name: "Priya Sharma",
     role: "relationship_manager",
@@ -54,7 +52,6 @@ const mockUsers = [
   },
   {
     email: "arjun@oxygensports.in",
-    password: "RMPassword123!",
     employeeId: "RM002",
     name: "Arjun Mehta",
     role: "relationship_manager",
@@ -65,7 +62,6 @@ const mockUsers = [
   },
   {
     email: "sneha@oxygensports.in",
-    password: "RMPassword123!",
     employeeId: "RM003",
     name: "Sneha Patel",
     role: "relationship_manager",
@@ -76,7 +72,6 @@ const mockUsers = [
   },
   {
     email: "vikram@oxygensports.in",
-    password: "RMPassword123!",
     employeeId: "RM004",
     name: "Vikram Singh",
     role: "relationship_manager",
@@ -205,17 +200,24 @@ async function seed() {
 
     // 1. Seed Users
     console.log("\nSeeding Users...");
+    const credentialsMap: Record<string, string> = {};
+
     for (const u of mockUsers) {
       let uid = "";
+      const generatedPassword = Math.random().toString(36).slice(-8) + "!" + Math.random().toString(36).slice(-4).toUpperCase() + "9";
+      credentialsMap[u.email] = generatedPassword;
+
       try {
         const userRecord = await auth.getUserByEmail(u.email);
         uid = userRecord.uid;
-        console.log(`- User already exists in Auth: ${u.email} (UID: ${uid})`);
+        // Update password to the new generated one to keep it in sync with console output
+        await auth.updateUser(uid, { password: generatedPassword });
+        console.log(`- User already exists in Auth: ${u.email} (UID: ${uid}) - Updated password.`);
       } catch (err: any) {
         if (err.code === "auth/user-not-found") {
           const userRecord = await auth.createUser({
             email: u.email,
-            password: u.password,
+            password: generatedPassword,
             displayName: u.name,
           });
           uid = userRecord.uid;
@@ -355,7 +357,7 @@ async function seed() {
     console.log("\nCredentials to sign in:");
     console.log("-----------------------------------------");
     for (const u of mockUsers) {
-      console.log(`Role: ${u.role.padEnd(20)} | Email: ${u.email.padEnd(25)} | Password: ${u.password}`);
+      console.log(`Role: ${u.role.padEnd(20)} | Email: ${u.email.padEnd(25)} | Password: ${credentialsMap[u.email]}`);
     }
     console.log("-----------------------------------------\n");
 

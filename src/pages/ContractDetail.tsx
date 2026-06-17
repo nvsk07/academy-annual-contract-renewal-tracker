@@ -145,7 +145,13 @@ export default function ContractDetail() {
               </div>
               <div className="flex items-center gap-1.5 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-                <span className="font-bold text-slate-900">{contract.daysRemaining}</span> days remaining
+                {contract.daysRemaining < 0 ? (
+                  <span className="font-bold text-red-600">Expired</span>
+                ) : (
+                  <>
+                    <span className="font-bold text-slate-900">{contract.daysRemaining}</span> days remaining
+                  </>
+                )}
               </div>
             </div>
           </div>
