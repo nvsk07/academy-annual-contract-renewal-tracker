@@ -50,6 +50,7 @@ const formSchema = z.object({
   department: z.string(),
   notes: z.string().optional(),
   contractValue: z.coerce.number().min(0, "Contract value must be a positive number"),
+  priceRevision: z.coerce.number().min(-100, "Price revision must be at least -100%").max(500, "Price revision must be at most 500%"),
 });
 
 export default function ContractNew() {
@@ -100,6 +101,7 @@ export default function ContractNew() {
       department: user?.department || "",
       notes: "",
       contractValue: 0,
+      priceRevision: 0,
     },
   });
 
@@ -150,6 +152,7 @@ export default function ContractNew() {
           department: contract.department,
           notes: contract.notes,
           contractValue: contract.contractValue || 0,
+          priceRevision: contract.priceRevision || 0,
         });
       }
       loadContract();
@@ -192,6 +195,7 @@ export default function ContractNew() {
           department: values.department,
           notes: values.notes || "",
           contractValue: Number(values.contractValue),
+          priceRevision: Number(values.priceRevision),
           workflowStage: (isEditMode ? form.getValues("status") === "Renewed" ? "renewed" : "active" : "created") as WorkflowStage
         };
 
@@ -442,6 +446,20 @@ export default function ContractNew() {
                       <Input type="number" placeholder="Enter financial value" {...field} />
                     </FormControl>
                     <FormDescription>Financial value (enforced but hidden from general detail displays)</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="priceRevision"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price Revision (%)*</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="e.g. 5 for +5% or -2 for -2%" {...field} />
+                    </FormControl>
+                    <FormDescription>Percentage adjust for this renewal/contract period</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

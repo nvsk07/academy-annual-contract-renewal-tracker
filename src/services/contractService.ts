@@ -60,6 +60,7 @@ function docToContract(id: string, data: any): Contract {
     notes: data.notes || "",
     workflowStage: data.workflowStage || "created",
     contractValue: data.contractValue || data.contract_value || 0,
+    priceRevision: data.priceRevision !== undefined ? data.priceRevision : (data.price_revision !== undefined ? data.price_revision : 0),
     createdAt: data.createdAt instanceof Timestamp
       ? data.createdAt.toDate().toISOString()
       : (data.createdAt || new Date().toISOString()),
@@ -79,6 +80,7 @@ function docToContract(id: string, data: any): Contract {
     contract_end_date: data.contractEndDate || data.contract_end_date || "",
     equipment_category: data.equipmentCategories || data.equipment_category || [],
     contract_value: data.contractValue || data.contract_value || 0,
+    price_revision: data.priceRevision !== undefined ? data.priceRevision : (data.price_revision !== undefined ? data.price_revision : 0),
     relationship_manager_id: data.relationshipManagerId || data.relationship_manager_id || "",
     relationship_manager_name: data.relationshipManagerName || data.relationship_manager_name || "",
     contract_status: data.status || data.contract_status || "Active",
@@ -287,6 +289,7 @@ export async function createContract(
     contract_end_date: data.contractEndDate,
     equipment_category: data.equipmentCategories,
     contract_value: data.contractValue,
+    price_revision: (data as any).priceRevision || 0,
     relationship_manager_id: rmId,
     relationship_manager_name: rmName,
     contract_status: data.status,
@@ -299,9 +302,6 @@ export async function createContract(
   };
 
   const docRef = await addDoc(collection(db, "contracts"), contractData);
-
-  // Generate a friendly ID by updating the document with an OXY-YYYY-NNN id
-  const oxyId = `OXY-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
 
   await logActivity(
     "contract_created",
@@ -352,6 +352,10 @@ export async function updateContract(
   if (updates.relationshipManagerId) updatePayload.relationship_manager_id = updates.relationshipManagerId;
   if (updates.relationshipManagerName) updatePayload.relationship_manager_name = updates.relationshipManagerName;
   if (updates.contractValue !== undefined) updatePayload.contract_value = updates.contractValue;
+  if (updates.priceRevision !== undefined) {
+    updatePayload.price_revision = updates.priceRevision;
+    updatePayload.priceRevision = updates.priceRevision;
+  }
 
   await updateDoc(doc(db, "contracts", id), updatePayload);
 

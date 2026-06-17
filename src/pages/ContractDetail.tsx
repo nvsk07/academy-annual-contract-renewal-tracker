@@ -233,7 +233,7 @@ export default function ContractDetail() {
         <Card className="shadow-sm">
           <CardHeader className="pb-3 border-b border-slate-100 bg-slate-50/50">
             <CardTitle className="text-base font-bold flex items-center text-slate-800">
-              <Calendar className="h-4 w-4 mr-2 text-blue-600" /> Contract Dates
+              <Calendar className="h-4 w-4 mr-2 text-blue-600" /> Contract Terms &amp; Value
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -253,6 +253,16 @@ export default function ContractDetail() {
               <div className="flex justify-between items-center p-4">
                 <span className="text-sm font-semibold text-slate-500">Supply Frequency</span>
                 <Badge variant="outline" className="bg-slate-50 text-slate-700 font-semibold border-slate-200">{contract.supplyFrequency}</Badge>
+              </div>
+              <div className="flex justify-between items-center p-4">
+                <span className="text-sm font-semibold text-slate-500">Contract Value</span>
+                <span className="font-bold text-slate-900">₹{contract.contractValue?.toLocaleString('en-IN') || "0"}</span>
+              </div>
+              <div className="flex justify-between items-center p-4">
+                <span className="text-sm font-semibold text-slate-500">Price Revision</span>
+                <span className={`font-bold ${contract.priceRevision > 0 ? 'text-green-600' : contract.priceRevision < 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                  {contract.priceRevision > 0 ? `+${contract.priceRevision}%` : `${contract.priceRevision}%`}
+                </span>
               </div>
             </div>
           </CardContent>

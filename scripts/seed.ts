@@ -292,6 +292,7 @@ async function seed() {
         notes: c.notes,
         workflowStage: c.status === "Active" ? "active" : "negotiation",
         contractValue: c.currentContractValue,
+        priceRevision: Math.round(((c.currentContractValue - c.previousContractValue) / c.previousContractValue) * 100),
         // snake_case aliases for Firestore compatibility
         academy_name: c.academyName,
         academy_type: c.academyType,
@@ -302,6 +303,7 @@ async function seed() {
         contract_end_date: eDate.split("T")[0],
         equipment_category: c.equipmentCategories,
         contract_value: c.currentContractValue,
+        price_revision: Math.round(((c.currentContractValue - c.previousContractValue) / c.previousContractValue) * 100),
         relationship_manager_id: c.relationshipManagerId,
         relationship_manager_name: c.relationshipManager,
         contract_status: c.status,

@@ -45,6 +45,7 @@ export interface Contract {
   notes: string;
   workflowStage: WorkflowStage;
   contractValue: number; // Hidden from UI, stored for backend
+  priceRevision: number; // Percentage value of price change on renewal (e.g. +5% or -2%)
   createdAt: string;
   updatedAt: string;
 
@@ -62,11 +63,13 @@ export interface Contract {
   contract_end_date: string;
   equipment_category: string[];
   contract_value: number;
+  price_revision: number;
   relationship_manager_id: string;
   relationship_manager_name: string;
   contract_status: string;
   created_at: string;
   updated_at: string;
 }
+
 
 

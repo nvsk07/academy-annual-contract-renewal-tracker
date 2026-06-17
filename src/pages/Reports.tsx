@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/utils/dateUtils";
 import HealthBadge from "@/components/HealthBadge";
+import { exportContractsToCSV } from "@/utils/csvUtils";
 
 export default function Reports() {
   const { user } = useAuth();
@@ -48,7 +49,8 @@ export default function Reports() {
   });
 
   const handleExport = () => {
-    toast({ title: "Export", description: "CSV export will be available in the final release." });
+    exportContractsToCSV(contracts, "oxygen_sports_contracts_report.csv");
+    toast({ title: "Export Success", description: "CSV report of filtered contracts downloaded successfully." });
   };
 
   if (isLoading) {

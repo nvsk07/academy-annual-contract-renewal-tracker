@@ -29,6 +29,7 @@ import { getHealthBadgeClasses, getStatusBadgeClasses } from "@/utils/contractUt
 import { formatDate } from "@/utils/dateUtils";
 import { CONTRACT_STATUSES, ACADEMY_TYPES } from "@/constants/contractConstants";
 import { deleteContract, updateContract } from "@/services/contractService";
+import { exportContractsToCSV } from "@/utils/csvUtils";
 
 export default function Contracts() {
   const { user } = useAuth();
@@ -51,9 +52,10 @@ export default function Contracts() {
   };
 
   const handleExport = () => {
+    exportContractsToCSV(contracts, "oxygen_sports_contracts_filtered.csv");
     toast({ 
-      title: "Data Export Initiated", 
-      description: "CSV report of visible contracts has been generated successfully." 
+      title: "Data Export Success", 
+      description: "CSV report of filtered contracts downloaded successfully." 
     });
   };
 
