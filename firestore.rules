@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper: is the requester a signed-in user? ──
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ── Helper: read the caller's user document ──
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userDoc().role == 'admin' && userDoc().status == 'active';
+    }
+
+    function isActiveRM() {
+      return isSignedIn() && userDoc().role == 'relationship_manager' && userDoc().status == 'active';
+    }
+
+    // ── /users/{uid} ──
+    match /users/{uid} {
+      // Admins can read/write all user profiles
+      allow read, write: if isAdmin();
+
+      // Users can read their own profile
+      allow read: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── /contracts/{contractId} ──
+    match /contracts/{contractId} {
+      // Admin: full CRUD on all contracts
+      allow read, write, delete: if isAdmin();
+
+      // RM: can read only their assigned contracts
+      allow read: if isActiveRM() &&
+        resource.data.relationshipManagerId == userDoc().employeeId;
+
+      // RM: can create a contract (assigns to themselves)
+      allow create: if isActiveRM() &&
+        request.resource.data.relationshipManagerId == userDoc().employeeId;
+
+      // RM: can update only their own contracts (cannot change RM assignment)
+      allow update: if isActiveRM() &&
+        resource.data.relationshipManagerId == userDoc().employeeId &&
+        request.resource.data.relationshipManagerId == resource.data.relationshipManagerId;
+
+      // RM: cannot delete
+      allow delete: if false;
+    }
+
+    // ── /activities/{activityId} ──
+    match /activities/{activityId} {
+      // Any active user can read activities
+      allow read: if isSignedIn() && userDoc().status == 'active';
+
+      // Any active user can create activity entries
+      allow create: if isSignedIn() && userDoc().status == 'active';
+
+      // No one can update or delete activity logs
+      allow update, delete: if false;
+    }
+  }
+}

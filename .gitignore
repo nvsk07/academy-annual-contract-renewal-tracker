@@ -47,3 +47,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+.replit
+replit.nix
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+firebase-service-account.json
