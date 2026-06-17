@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,20 +8,53 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { User, Bell, Shield, Settings2, Save, Users } from "lucide-react";
+import { User, Bell, Shield, Settings2, Save, Users, Loader2 } from "lucide-react";
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, changePassword } = useAuth();
   const { toast } = useToast();
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     toast({ title: "Settings Saved", description: "Your preferences have been updated successfully." });
   };
 
-  const handlePasswordReset = (e: React.FormEvent) => {
+  const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Password Updated", description: "Your password has been changed successfully." });
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast({ title: "Error", description: "All fields are required.", variant: "destructive" });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: "Error", description: "New password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      await changePassword(currentPassword, newPassword);
+      toast({ title: "Password Updated", description: "Your password has been changed successfully." });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to update password. Verify your current password.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdatingPassword(false);
+    }
   };
 
   return (
@@ -143,21 +177,58 @@ export default function Settings() {
               <CardDescription>Update your password to keep your account secure.</CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              <form onSubmit={handlePasswordReset} className="space-y-4 max-w-md">
+              <form onSubmit={handlePasswordReset} className="space-y-4 max-w-md" noValidate>
                 <div className="space-y-2">
                   <Label htmlFor="current">Current Password</Label>
-                  <Input id="current" type="password" required />
+                  <Input 
+                    id="current" 
+                    type="password" 
+                    required 
+                    value={currentPassword} 
+                    onChange={(e) => setCurrentPassword(e.target.value)} 
+                    placeholder="Enter current password"
+                    className="bg-slate-50 border-slate-200"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="new">New Password</Label>
-                  <Input id="new" type="password" required />
+                  <Input 
+                    id="new" 
+                    type="password" 
+                    required 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    placeholder="Minimum 6 characters"
+                    className="bg-slate-50 border-slate-200"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm">Confirm New Password</Label>
-                  <Input id="confirm" type="password" required />
+                  <Input 
+                    id="confirm" 
+                    type="password" 
+                    required 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    placeholder="Re-enter new password"
+                    className="bg-slate-50 border-slate-200"
+                  />
                 </div>
                 <div className="pt-4 flex justify-end">
-                  <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white">Update Password</Button>
+                  <Button 
+                    type="submit" 
+                    className="bg-slate-900 hover:bg-slate-800 text-white font-semibold"
+                    disabled={isUpdatingPassword}
+                  >
+                    {isUpdatingPassword ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      "Update Password"
+                    )}
+                  </Button>
                 </div>
               </form>
             </CardContent>
